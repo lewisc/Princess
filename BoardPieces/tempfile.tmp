@@ -1,0 +1,50 @@
+﻿#light 
+namespace MoveGen
+  exception InvalidMove of Move
+  type Board =
+    class
+      interface System.Collections.IEnumerable
+      interface seq<seq<Pieces option>>
+      new : ?initialval:Pieces option [,] * ?start:Color * ?contplay:bool *
+            ?length:int option * ?hist:Move list -> Board
+      val localContent: Pieces option [,]
+      val turn: Color
+      val playing: bool
+      val stringrep: System.Lazy<string>
+      val moves: System.Lazy<Move list>
+      val whitepieces: System.Lazy<(Pieces * Position) list>
+      val blackpieces: System.Lazy<(Pieces * Position) list>
+      val maxmoves: int option
+      val prevmoves: Move list
+      override ToString : unit -> string
+      member Update : (int * int) * (int * int) -> Board
+      member BlackPieces : (Pieces * Position) list
+      member History : Move list
+      member InPlay : bool
+      member Item : xcoord:int * ycoord:int -> Pieces option with get
+      member Length : int
+      member Moves : Move list
+      member Stalemate : int option
+      member Turn : Color
+      member WhitePieces : (Pieces * Position) list
+      member Width : int
+      static member MoveValues : input:Board -> Move list
+      static member
+        availableMoves : input:List<Pieces * Position> ->
+                           game:Board -> Move list
+      static member defaultBoard : unit -> Pieces option [,]
+      static member
+        getPieces : game:Board -> color:Color -> (Pieces * (int * int)) list
+      static member printer : board:Board -> string
+      static member
+        scan : x:int * y:int ->
+                 game:Board ->
+                   hue:Color ->
+                     endcount:int option -> dx:int -> dy:int -> List<Move>
+      static member
+        testValid : x:int -> y:int -> game:Board -> hue:Color -> MoveType
+      static member
+        validPieceMoves : piece:Pieces ->
+                            pos:Position -> game:Board -> List<Move>
+    end
+
