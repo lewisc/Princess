@@ -72,25 +72,27 @@ type StateUpdate =
 
 
 //new record for the new model of code
+[<NoEquality; NoComparison>]
 type GameState = 
-            {mutable Turn:Color;
-             BoardState:Pieces option [,];
-             TimeOut:int;
-             mutable IsPlaying:bool;
-             mutable AvailableMoves:Ply list Lazy;
-             mutable Index:int;
-             mutable WhitePieces:(Pieces * Position) list;
-             mutable BlackPieces:(Pieces*Position) list;
-             mutable ZobristHash:int64;
-             mutable State:Incrementor;
-             EvalFunc: StateUpdate -> GameState -> Score * Incrementor;
-             mutable Value:Score;
+            { mutable Turn:Color;
+              BoardState:Pieces option [,];
+              TimeOut:int;
+              mutable IsPlaying:bool;
+              mutable AvailableMoves:Ply list Lazy;
+              mutable Index:int;
+              mutable WhitePieces:(Pieces * Position) list;
+              mutable BlackPieces:(Pieces*Position) list;
+              mutable ZobristHash:int64;
+              mutable State:Incrementor;
+              EvalFunc: StateUpdate -> GameState -> Score * Incrementor;
+              mutable Value:Score;
              }
 
 //the type that incrementally evaluates the gamestate
 type Evaluator = StateUpdate -> GameState -> Score * Incrementor
 
 
+[<NoEquality; NoComparison>]
 type Undo = 
        {OldMoves: Ply List Lazy;
         OldWhite:(Pieces * Position) List;

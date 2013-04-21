@@ -6,6 +6,7 @@ open ZobristKeys
 open BoardConstants
 
 //Invalid move exception
+[<NoEquality;NoComparison>]
 exception public InvalidMove of Ply * GameState
 
 //the different things that can happen with a move.

@@ -9,6 +9,7 @@ open TypedInput
 type Status = | Inplay of Ply option
               | End of Color
 
+[<NoEquality;NoComparison>]
 type Player = {EvalFun:Evaluator;
                EvalInit:GameState->(int*Incrementor);
                SearchPrime:int64->GameState->(Ply*Score);
