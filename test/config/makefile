@@ -1,15 +1,14 @@
-fsc=fsharpc --nologo
+fsc=fsharpc --nologo --warn:5 -I:binaries
 optimize=--optimize --tailcall+ --crossoptimize+
 debug=-g
 
 
-../output/Resources.dll : binaries/Resources.dll binaries
-	cp binaries/* ../output
+all : binaries/Resources.dll binaries
 
 binaries/Resources.dll : Properties/Resources.Designer.cs Properties/Resources.resx binaries Properties/Resources.Designer.cs
 	dmcs -optimize -target:library  -resource:Properties/Resources.resx -r:System.Drawing.dll -out:binaries/Resources.dll Properties/Resources.Designer.cs 
 
-clean:
+clean :
 	rm -rf binaries
 
 binaries :
