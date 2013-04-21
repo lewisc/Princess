@@ -24,7 +24,7 @@ binaries/MTDF.dll  : binaries MTDF.fs binaries/AlphaBeta.dll
 	$(fsc) $(optimize) --out:binaries/MTDF.dll -a -r:AlphaBeta.dll -r:Elements.dll -r:ValidMoves.dll -r:BoardConstants.dll -r:TranspositionTable.dll -r:DepthFirstSearch.dll MTDF.fs
 
 binaries : tables/binaries
-	mkdir binaries
+	mkdir -p binaries
 	cp tables/binaries/* binaries
 
 tables/binaries :

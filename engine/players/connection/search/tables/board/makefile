@@ -21,7 +21,7 @@ binaries/Elements.dll : binaries Elements.fs
 	$(fsc) $(optimize) -a --out:binaries/Elements.dll  Elements.fs
 
 binaries :
-	mkdir binaries
+	mkdir -p binaries
    
 clean :
 	rm -rf binaries

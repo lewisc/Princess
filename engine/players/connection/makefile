@@ -11,7 +11,7 @@ binaries/ServerConnection.dll : binaries ServerConnection.fs binaries/IMCSConnec
 	$(fsc) $(optimize) -a --out:binaries/ServerConnection.dll -r:Elements.dll  -r:IMCSConnection.dll -r:ValidMoves.dll -r:TypedInput.dll ServerConnection.fs
 
 binaries : search/binaries
-	mkdir binaries
+	mkdir -p binaries
 	cp search/binaries/* binaries
 
 search/binaries :

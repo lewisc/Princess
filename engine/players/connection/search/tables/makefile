@@ -9,7 +9,7 @@ binaries/TranspositionTable.dll  : binaries TranspositionTable.fs
 	$(fsc) $(optimize) --out:binaries/TranspositionTable.dll -a -r:Elements.dll -r:ValidMoves.dll -r:ZobristKeys.dll TranspositionTable.fs
 
 binaries : board/binaries
-	mkdir binaries
+	mkdir -p binaries
 	cp board/binaries/* binaries
 
 board/binaries :

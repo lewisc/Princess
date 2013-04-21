@@ -12,4 +12,4 @@ clean :
 	rm -rf binaries
 
 binaries :
-	mkdir binaries
+	mkdir -p binaries
