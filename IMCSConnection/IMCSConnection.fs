@@ -13,7 +13,7 @@ exception ConnectionError of string
 ///Invalid protocol exception, for when unknown protocol events occur
 exception ProtocolError of string
 
-type private CodeVal = 
+type CodeVal = 
             | InputError
             | Error of int
             | Command of int

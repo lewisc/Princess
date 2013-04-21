@@ -13,6 +13,9 @@ binaries/ServerConnection.dll : binaries ServerConnection.fs binaries/IMCSConnec
 
 binaries :
 	mkdir binaries
+
+clean :
+	rm -rf binaries
    
 
 

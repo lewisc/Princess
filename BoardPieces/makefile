@@ -23,5 +23,7 @@ binaries/Elements.dll : binaries Elements.fs
 binaries :
 	mkdir binaries
    
+clean :
+	rm -rf binaries
 
 
