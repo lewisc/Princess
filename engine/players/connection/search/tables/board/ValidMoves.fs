@@ -43,27 +43,19 @@ module BoardCombinators=
     //represents a default board
     let private defaultBoard  = 
      array2D [|
-               [|Some(King(White)); Some(Queen(White));Some(Bishop(White));
-               Some(Knight(White));Some(Rook(White))|];
-               [|Some(Pawn(White)) ;Some(Pawn(White));Some(Pawn(White));
-               Some(Pawn(White));Some(Pawn(White))|];
-
-
+               [|Some(King(White)); Some(Queen(White));Some(Bishop(White)); Some(Knight(White));Some(Rook(White))|];
+               [|Some(Pawn(White)) ;Some(Pawn(White));Some(Pawn(White)); Some(Pawn(White));Some(Pawn(White))|];
                [|None ;None ;None;None;None|];
                [|None ;None ;None;None;None|];
-
-               [|Some(Pawn(Black));Some(Pawn(Black));Some(Pawn(Black));
-               Some(Pawn(Black));Some(Pawn(Black))|];
-               [|Some(Rook(Black));Some(Knight(Black));Some(Bishop(Black));
-               Some(Queen(Black)); Some(King(Black))|];|]
+               [|Some(Pawn(Black));Some(Pawn(Black));Some(Pawn(Black)); Some(Pawn(Black));Some(Pawn(Black))|];
+               [|Some(Rook(Black));Some(Knight(Black));Some(Bishop(Black)); Some(Queen(Black)); Some(King(Black))|];|]
 
     
     //gets the pieces on the board of the associated color
     let piecesOfGame (board:Pieces option [,]) color =
-        List.fold (fun acc (x,y) ->
-                match board.[x,y] with 
-                | Some(p) when pieceColor p = color -> (p,(x,y))::acc
-                | _ -> acc) [] allPositions
+        Array.fold (fun acc (x,y) -> match board.[x,y] with 
+                                     | Some(p) when pieceColor p = color -> (p,(x,y))::acc
+                                     | _ -> acc) [] allPositions
 
     //takes in a 2 dimensional array and turns it into a seq<seq<'a>>
     let arrayAsSeq (input: 'a [,]) =
@@ -93,18 +85,17 @@ module BoardCombinators=
 
     //returns the possibilities for a move(capture, invalid, normal).
     //Normal moves can be continued, invalid/captures can't
-    let private testValidMove (x:int) (y:int) (board:Pieces option[,])  
-                                                    (hue:Color)  : MoveType =
+    let private testValidMove (x:int) (y:int) (board:Pieces option[,]) (hue:Color)  : MoveType =
                 if (x > maxXVal  || 
                     x < 0  || 
                     y > maxYVal  || 
                     y < 0)
                 //if the move is off the board
                 then Invalid
-                else match (board.[x,y], hue) with
+                else match (board.[x,y]) with
                      //the case where the desitnation is empty
-                     | (None, _) -> Normal
-                     | (Some(z), t) -> match (pieceColor z,t) with 
+                     | (None) -> Normal
+                     | (Some(z)) -> match (pieceColor z,hue) with 
                                         //can't capture own piece
                                        | (Black, Black) 
                                        | (White, White) -> Invalid
@@ -176,7 +167,7 @@ module BoardCombinators=
                                     | Black -> -1
                          nocap1 (sign) (0) @ 
                          withcap1 (sign) (-1) @
-                         withcap1(sign) (1) 
+                         withcap1 (sign) (1) 
     
         | Rook(color) ->  scannerA  1  0 @ scannerA  0  1 @
                           scannerA -1  0 @ scannerA  0 -1

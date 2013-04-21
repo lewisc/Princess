@@ -12,27 +12,27 @@ module BoardConstants =
     [<Literal>]
     let boardLength = 6
 
-    let blackPieces= [King(Black); 
+    let blackPieces= [|King(Black); 
                       Queen(Black);
                       Knight(Black);
                       Rook(Black);
                       Pawn(Black);
-                      Bishop(Black);]
+                      Bishop(Black);|]
     
-    let whitePieces= [King(White); 
+    let whitePieces= [|King(White); 
                       Queen(White);
                       Knight(White);
                       Rook(White);
                       Pawn(White);
-                      Bishop(White);]
+                      Bishop(White);|]
 
-    let allPieces = blackPieces@whitePieces
+    let allPieces = Array.append blackPieces whitePieces
 
-    let allPositions = [for i in 0..maxXVal do 
-                            for j in 0..maxYVal-> (i,j)]
+    let allPositions = [|for i in 0..maxXVal do 
+                            for j in 0..maxYVal-> (i,j)|]
 
     let weightedWhitePieces =
-        [King(White); 
+        [|King(White); 
          Queen(White);
          Knight(White);
          Rook(White);
@@ -41,10 +41,10 @@ module BoardConstants =
          Pawn(White);
          Pawn(White);
          Pawn(White);
-         Pawn(White);]
+         Pawn(White);|]
 
     let weightedBlackPieces =
-        [King(Black); 
+        [|King(Black); 
          Queen(Black);
          Knight(Black);
          Rook(Black);
@@ -53,15 +53,15 @@ module BoardConstants =
          Pawn(Black);
          Pawn(Black);
          Pawn(Black);
-         Pawn(Black);]
+         Pawn(Black);|]
 
-    let allWeightedPieces = weightedWhitePieces@weightedBlackPieces
+    let allWeightedPieces = Array.append weightedWhitePieces weightedBlackPieces
 
     let pieceCombinations n =
         let ret = [King(Black);King(White)]
         let remainingPieces = List.choose (fun x -> match x with
-                                                    | King(_) -> None
-                                                    | x -> Some(x)) allWeightedPieces
+                                                     | King(_) -> None
+                                                     | x -> Some(x)) (Array.toList allWeightedPieces)
         let rec searcher d (set:Pieces list Set) currlist listremaining =
                 match d with
                 | 0 -> set.Add(currlist)
