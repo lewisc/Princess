@@ -1,11 +1,12 @@
 ﻿namespace Searching
 open MoveGeneration
 open BoardCombinators
-open DepthFirstSearch 
+open BoardHelpers
 
 module Heuristics =
     [<Literal>]
     let advancementValue = 1
+
     let onPlay c = match c with
                    | White -> 1
                    | Black -> -1
@@ -25,11 +26,11 @@ module Heuristics =
 
         let score = whites - black 
 
-        (score, {WhiteScore=whites;
-                 BlackScore=black;
-                 BlackPawnScore=0;
-                 WhitePawnScore=0;
-                 Advancement=0;})
+        (score, new Incrementor (whitescore=whites,
+                                 blackscore=black,
+                                 blackpawnscore=0,
+                                 whitepawnscore=0,
+                                 advancement=0))
 
     let SimpleCount (input) (game:GameState) : Score * Incrementor=
         let old = input.OldPiece
@@ -51,11 +52,11 @@ module Heuristics =
 
         let retval = (whitescore-blackscore)*(onPlay game.Turn)
         assert(retval = (fst (initialSimple game))*(onPlay game.Turn))
-        ((retval),{WhiteScore=whitescore;
-                                  BlackScore=blackscore;
-                                  BlackPawnScore=0;
-                                  WhitePawnScore=0;
-                                  Advancement=0; })
+        ((retval),new Incrementor (whitescore=whitescore,
+                                   blackscore=blackscore,
+                                   blackpawnscore=0,
+                                   whitepawnscore=0,
+                                   advancement=0))
 
     let initialAdvancement game = 
         let whites = List.sum (List.map pieceValue (List.map fst game.WhitePieces))
@@ -63,11 +64,11 @@ module Heuristics =
 
         let score = whites - black 
 
-        (score, {WhiteScore=whites;
-                 BlackScore=black;
-                 BlackPawnScore=0;
-                 WhitePawnScore=0;
-                 Advancement=0;})
+        (score, new Incrementor (whitescore=whites,
+                                 blackscore=black,
+                                 blackpawnscore=0,
+                                 whitepawnscore=0,
+                                 advancement=0))
 
     let Advancement (input) (game:GameState) : Score * Incrementor=
         let old = input.OldPiece
@@ -110,8 +111,8 @@ module Heuristics =
             | _ -> game.State.WhitePawnScore, game.State.BlackPawnScore
 
         let retval = (whitescore-blackscore + whitepawn-blackpawn)*(onPlay game.Turn)
-        ((retval),{WhiteScore=whitescore;
-                                  BlackScore=blackscore;
-                                  BlackPawnScore=blackpawn;
-                                  WhitePawnScore=whitepawn;
-                                  Advancement=0; })
+        ((retval),new Incrementor (whitescore=whitescore,
+                                   blackscore=blackscore,
+                                   blackpawnscore=blackpawn,
+                                   whitepawnscore=whitepawn,
+                                   advancement=0))

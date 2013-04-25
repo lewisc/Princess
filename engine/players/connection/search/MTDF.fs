@@ -5,6 +5,8 @@ open System.Diagnostics
 open MoveGeneration
 open AlphaBeta2
 open DepthFirstSearch
+open BoardHelpers
+
 module MTDF =
 
     //a basic fixed depth MTD(f) algorithm
@@ -49,9 +51,9 @@ module MTDF =
             do undoUpdate newgame newundo
             (x,ret)
         //get the results
-        let retval = List.map (mapper game) (game.AvailableMoves.Force())
+        let retval = Array.map (mapper game) (game.AvailableMoves.Force())
         //and get the correct value
-        List.maxBy snd retval
+        Array.maxBy snd retval
 
     //MTD(f) in an iterative deepening framework
     //Note, this is not particularly atomic, can runover by potentially a second or
@@ -82,19 +84,22 @@ module MTDF =
 
             //unroll the top node
             let mutable curralpha = -inf
-            let mutable movelist = []
+            let (movelist:(Ply*int) option []) = Array.create 600 None
+            let mutable index = 0
             let mutable bestmove = (botMove,-inf-1000)
 
             for l in bestguesslist do
                 let appmove = fst l
                 let appscore = snd l
-                let newnode = update game  appmove
+                let (newnode,undo) = doUpdate game  appmove
                 let newalpha = -(searcher (currdepth-1) newnode -appscore -curralpha -inf)
-                do movelist <- (appmove,newalpha)::movelist
+                do movelist.[index] <- Some(appmove,newalpha)
+                do index <- index + 1
                 do curralpha <- newalpha
                 if newalpha > (snd bestmove) then
                     do bestmove <- (appmove,newalpha)
                 else ()
+                do undoUpdate newnode undo
                        
             //if we found a win, return it, if we founda lose, return our next best move
             //note, there's an extremely unlikely bug here
@@ -103,9 +108,9 @@ module MTDF =
                     currbestmove
             elif (snd bestmove) >= (inf/2) then bestmove
             elif (snd bestmove) <= (-inf/2) then currbestmove
-            else deepener (currdepth+2) bestmove (List.sortBy snd movelist)
+            else deepener (currdepth+2) bestmove (Array.sortBy snd (Array.choose (fun x -> x) movelist))
 
         //run the deepener, start at 0 to get good first guesses, build an initial value with
         //0's which are basically discarded since the depth 0 search just gets the moves score
-        deepener 0 (botMove,(-inf-1000)) (List.map (fun x -> x,0) (game.AvailableMoves.Force()))
+        deepener 0 (botMove,(-inf-1000)) (Array.map (fun x -> x,0) (game.AvailableMoves.Force()))
             

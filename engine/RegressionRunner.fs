@@ -151,4 +151,4 @@ let TESTGAME =
     //do BoardCombinators.boardToString ret |> printfn "%s"
     *)
 
-do SEARCHTEST ()
+do MOVETEST()

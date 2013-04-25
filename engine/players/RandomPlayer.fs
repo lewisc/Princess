@@ -5,6 +5,7 @@ open BoardCombinators
 open Searching.Heuristics
 open System
 open System.IO
+open BoardHelpers
 
 let Rand = Random()
 
@@ -14,7 +15,7 @@ let Args = System.Environment.GetCommandLineArgs()
 let RandomMove (board:GameState) =
          let newnodes = board.AvailableMoves.Force()
          if (newnodes).Length > 0
-         then (Array.ofList (newnodes)).[Rand.Next(0,(newnodes.Length-1))]
+         then (newnodes).[Rand.Next(0,(newnodes.Length-1))]
          else raise (Hell("boarked"))
 
 
@@ -33,6 +34,6 @@ for i = 1 to 1000 do
     printfn "%d" i
     while toplay.IsPlaying = true do
         toprint <- RandomMove toplay
-        toplay <- update toplay (toprint)
+        toplay <- fst (doUpdate toplay (toprint))
         Printer.WriteLine(sprintMove toprint)
 //x        Printer.WriteLine(toplay.ToString())

@@ -4,7 +4,7 @@ open System
 open System.Collections.Generic
 
 module ZobristKeys =
-    let piecesOption = Array.append [|None|] ((Array.map (fun x -> Some(x)) allPieces))
+    let piecesOption = Array.append [|None|] ((Array.map (fun x -> Some(x)) (allPiecesStart ())))
     let pieceXPosition = 
         Array.collect (fun x -> (Array.map (fun y -> x,y ) allPositions)) piecesOption 
 

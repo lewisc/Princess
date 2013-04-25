@@ -20,6 +20,7 @@ type Variation = Ply list
 type Color =
      | Black
      | White
+
 //used for the IMCS server, and other diagnostics
 //needs to be captiol
 with override self.ToString() =
@@ -35,6 +36,7 @@ type Pieces =
      | Knight of Color
      | Rook of Color
      | King of Color
+
 //Print out a character representing the piece and it's color
 with  override self.ToString() = 
 //prints out a character representing the piece
@@ -51,16 +53,30 @@ with  override self.ToString() =
                     | Pawn(White) -> "P"
                     | Bishop(Black) -> "b"
                     | Bishop(White) -> "B"
+
 //type alias for the board as a sequence of sequences
 type BoardSeq = Pieces option seq seq
 
+///Board Type alias
+type Board = Pieces option [,]
+
+
+//Type that get's passed into the Evaluator
+//TODO:Should be genericized
 type Incrementor =
-            {BlackScore:Score;
-             WhiteScore:Score;
-             Advancement:Score;
-             BlackPawnScore:Score;
-             WhitePawnScore:Score;
-             }
+    struct
+        val BlackScore     :Score;
+        val WhiteScore     :Score;
+        val Advancement    :Score;
+        val BlackPawnScore :Score;
+        val WhitePawnScore :Score;
+        new(blackscore:Score, whitescore:Score, advancement:Score, blackpawnscore:Score, whitepawnscore:Score) = {BlackScore = blackscore;
+                                                                                                                 WhiteScore = whitescore;
+                                                                                                                 Advancement = advancement;
+                                                                                                                 BlackPawnScore = blackpawnscore;
+                                                                                                                 WhitePawnScore = whitepawnscore;}
+    end
+            
 
 //the type that gets passed into the evaluator
 //to update the state
@@ -71,20 +87,21 @@ type StateUpdate =
      Move:Ply;}
 
 
-//new record for the new model of code
+//Do/Undo State of a game. This is why this struct is all mutable
 [<NoEquality; NoComparison>]
 type GameState = 
-            { mutable Turn:Color;
-              BoardState:Pieces option [,];
+            { 
+              EvalFunc: StateUpdate -> GameState -> Score * Incrementor;
               TimeOut:int;
+              BoardState:Pieces option [,];
+              mutable Turn:Color;
               mutable IsPlaying:bool;
-              mutable AvailableMoves:Ply list Lazy;
+              mutable AvailableMoves:((Ply []) Lazy);
               mutable Index:int;
               mutable WhitePieces:(Pieces * Position) list;
               mutable BlackPieces:(Pieces*Position) list;
               mutable ZobristHash:int64;
               mutable State:Incrementor;
-              EvalFunc: StateUpdate -> GameState -> Score * Incrementor;
               mutable Value:Score;
              }
 
@@ -92,9 +109,10 @@ type GameState =
 type Evaluator = StateUpdate -> GameState -> Score * Incrementor
 
 
+///An undo struct that should have every necessary to unwork a move
 [<NoEquality; NoComparison>]
 type Undo = 
-       {OldMoves: Ply List Lazy;
+       {OldMoves:(Ply []) Lazy;
         OldWhite:(Pieces * Position) List;
         OldBlack:(Pieces * Position) List;
         OldHash:int64;

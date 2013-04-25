@@ -2,35 +2,30 @@
 open System.Diagnostics
 open MoveGeneration
 open BoardCombinators
+open BoardHelpers
 
 exception SearchException of string
 
 module DepthFirstSearch =
     let counter = ref 0
 
-    [<Literal>]
-    let inf = 1000
-
-    let botMove = ((-1,-1),(-1,-1))
-
-    let naiveDFS driver depth game side = 
-        let ret =  List.map (fun x ->   //- negamax depth-1 childnode opposite side
-            (x, -(snd (driver (depth-1) (update game x) -side)))) (game.AvailableMoves.Force())
-        let reter =List.maxBy snd ret
-        reter
 
     let doUndoDfs driver depth game side =
-        let rec searcher depth side movelist undoer (move,score)=
-            match movelist with
-            | head::tail -> 
+        let movelist = game.AvailableMoves.Force()
+        let maxmove = movelist.Length
+        let rec searcher depth side undoer (move,score) index=
+            match index with
+            | x -> 
+                let head = movelist.[x]
                 let (newgame,newundo) = doUpdate game head
                 let (_,newtest) =  driver (depth-1) newgame -side
                 do undoUpdate game newundo
                 let testval = -newtest
-                searcher depth side tail (Some(newundo)) (if testval > (score) then (head,testval) else (move,score))
+                searcher depth side (Some(newundo)) (if testval > (score) then (head,testval) else (move,score)) (index+1)
 
-            | [] -> (move,score)
-        let ret = searcher depth side (game.AvailableMoves.Force()) None (botMove,-inf-1000)
+            | y when y >= maxmove  -> (move,score)
+
+        let ret = searcher depth side None (botMove,-inf-1000) 0
         ret
 
     let onPlay game = match game.Turn with 
@@ -82,9 +77,7 @@ module DepthFirstSearch =
             elif (snd newmove) >= (inf/2) then newmove
             elif (snd newmove) <= (-inf/2) then currbestmove
             else driver (currdepth+2) newmove 
-        driver 2 ((game.AvailableMoves.Force()).Head,-1)
+        driver 2 ((game.AvailableMoves.Force()).[0],-1)
 
-    let IterativeDeepener = IterativeDeepenerFrame naiveDFS
     let IterativeDeepenerDoUndo = IterativeDeepenerFrame doUndoDfs
-    let DepthFirstSearch = DepthFirstSearchFrame naiveDFS
     let DepthFirstSearchdoUndo = DepthFirstSearchFrame doUndoDfs

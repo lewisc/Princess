@@ -4,6 +4,7 @@ open System.IO
 open MoveGeneration
 open BoardCombinators
 open TypedInput
+open BoardHelpers
 
 ///used to determine whether the game is continuting  or someone has one
 type Status = | Inplay of Ply option
@@ -205,12 +206,12 @@ module Actions =
                  //the opponents color(which should switch to pondering)
                  | x when x = initialcolor-> 
                                    let (newmove,x) = searchprime gamestate
-                                   let newgame = update gamestate newmove
+                                   let (newgame,_) = doUpdate gamestate newmove
                                    do printfn "Move %s, score %d" (sprintMove newmove) x
                                    do printfn "%s" (sprintBoard newgame)
                                    if newmove <> ((-1,-1),(-1,-1)) then 
                                        do playMove connection newmove
-                                   else do playMove connection (gamestate.AvailableMoves.Force().Head)
+                                   else do playMove connection (gamestate.AvailableMoves.Force().[0])
                                    play newgame (notColor color)
                  //get the result from pondering, we don't do anything with it, but
                  //future diagnostics may
@@ -219,7 +220,7 @@ module Actions =
                         let response = readToGameStop connection
                         match response with
                         | Inplay(t) -> match t with
-                                       | Some(move) -> let newgame = update gamestate move
+                                       | Some(move) -> let (newgame,_) = doUpdate gamestate move
                                                        play newgame (notColor color)
                                     //this indicates that a parse error occurred, but technically
                                     //we might be able to muscle past
