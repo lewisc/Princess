@@ -27,7 +27,7 @@ if Args.Length < 2 then printfn "requires a filename"
 else
 use Printer = new StreamWriter(Args.[1])
 
-for i = 1 to 1000 do
+for i = 1 to 10000 do
     toplay <- initialState SimpleCount initialSimple
     
     Printer.WriteLine("=Game " + i.ToString())

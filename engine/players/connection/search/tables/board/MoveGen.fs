@@ -50,20 +50,22 @@ module MoveCalculation =
                 let rec scanloop xnew ynew count index = 
                     let newx = xnew+dx
                     let newy = ynew+dy
-                    if endcount < count  then (retval, index) else
+                    if endcount < count  then (retval, (index)) else
                     //march through the possibilities
                     match (testValidMove newx newy board hue) with
-                    | Invalid -> (retval, index)
+                    | Invalid -> (retval, (index))
                     | Normal  -> match attacktype with
                                  | Take -> scanloop newx newy (count+1) index
                                  | Both | Free ->  
-                                     do retval.[index] <- ((x,y),(newx,newy))
-                                     scanloop newx newy (count+1) (index+1)
+                                     let newIndex = index+1
+                                     do retval.[newIndex] <- ((x,y),(newx,newy))
+                                     scanloop newx newy (count+1) newIndex
                     | Capture(_) -> 
                                 match attacktype with
                                 | Free -> (retval, index)
-                                | Both | Take -> do retval.[index] <- ((x,y),(newx,newy))
-                                                 (retval, index)
+                                | Both | Take -> let newIndex = index+1
+                                                 do retval.[newIndex] <- ((x,y),(newx,newy))
+                                                 (retval, newIndex)
                 scanloop x y 1 index 
       
     //gets a list of all valid moves from a 
@@ -136,5 +138,5 @@ module MoveCalculation =
     //given gameboard
     let movesFrom (input:(Pieces * Position) List) (board) : (Ply []) = 
           //get all of the available moves
-          let (retval,endIndex) = List.fold (fun (availableMoves, index)  (piece,pos) -> validMoves piece pos board availableMoves index) ((Array.create 600 ((0,0),(0,0))), 0) input 
-          retval.[0..(endIndex-1)]
+          let (retval,endIndex) = List.fold (fun (availableMoves, index)  (piece,pos) -> validMoves piece pos board availableMoves index) ((Array.create 600 ((0,0),(0,0))), (-1)) input 
+          retval.[0..endIndex]

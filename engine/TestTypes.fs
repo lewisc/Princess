@@ -11,6 +11,8 @@ let testFunc f =
     stopwatch.Stop()
     (retval, stopwatch.ElapsedMilliseconds)
 
+//z is performance, y is passed or failed
+//s is a string to print (identifier of test
 let tester x = List.iter (fun (x,y,(z:int64)) -> do printf "%s " x; 
                                                  do if y 
                                                     then printf "passed " 

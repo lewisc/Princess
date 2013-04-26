@@ -51,16 +51,19 @@ module BoardHelpers =
                         |Some(p)->(p.ToString()+retstr) 
                         | None -> "."+retstr
                   //fold the outer
-                  List.fold 
-                    //take in 1 line of the outer and fold it into a string
-                    (fun retstr list -> 
-                        (List.fold 
-                               //take in a line of the innter and fold it
-                               (fun retstr piece -> printer retstr piece)
-                                        //endof line and initial conditions
-                                        "" (List.ofSeq list))+"\r\n"+retstr)
-                            //initial conditions and intput
-                            "" (List.ofSeq (arrayAsSeq board.BoardState))
+                  let output=
+                    List.fold 
+                        //take in 1 line of the outer and fold it into a string
+                        (fun retstr list -> 
+                            (List.fold 
+                                   //take in a line of the innter and fold it
+                                   (fun retstr piece -> printer retstr piece)
+                                            //endof line and initial conditions
+                                            "" (List.ofSeq list))+"\n"+retstr)
+                                           //initial conditions and intput
+                                            "" (List.ofSeq (arrayAsSeq board.BoardState))
+                  sprintf "%s turn:%d\n" output board.Index
+
 
     //pretty print for moves
     let sprintMove ((from1,from2),(to1,to2)) =
@@ -81,4 +84,3 @@ module BoardHelpers =
     let isTerminal input =
         if input.IsPlaying && input.Index <= input.TimeOut then false
         else true
-

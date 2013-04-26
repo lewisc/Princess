@@ -139,7 +139,7 @@ module BoardCombinators=
             BoardState=(defaultBoard ());
             TimeOut=81;
             IsPlaying=true;
-            Index=0;
+            Index=1;
             BlackPieces=(piecesOfGame (defaultBoard ()) Black);
             WhitePieces=pieces;
             AvailableMoves=lazy(movesFrom pieces (defaultBoard ()));
@@ -161,9 +161,14 @@ module BoardCombinators=
                          List.fold (fun (board:GameState) (play) -> 
                              checkedUpdate board play) (initialState (fun  _ _-> 
                                         (0,(new Incrementor()))) (fun _ -> (0,(new Incrementor())))) (totest)
+
+        //            do printfn "%s" (sprintBoard complete )
                     isTerminal complete
                 with
-                |  InvalidMove(x,y) -> printMove x
+                |  InvalidMove(x,y) -> do printMove x
+                                       do printfn "\nFailed to apply the above move to:\n"
+                                       do printfn "%s" (sprintBoard y)
+                                       do printfn "\n"
                                        false
     
     //tests whether a game executes, disables checks so runs much faster
@@ -180,7 +185,7 @@ module BoardCombinators=
     let tryPlay (board:GameState) action =
         match (action, not (isTerminal board)) with
         | ReadInput(z), true-> 
-                 if Array.exists (fun x -> x = z) (board.AvailableMoves.Force())
-                 then (true, fst (doUpdate board z))
-                 else (false, board)
+                            if Array.exists (fun x -> x = z) (board.AvailableMoves.Force())
+                            then (true, fst (doUpdate board z))
+                            else (false, board)
         | _  -> (false, board)

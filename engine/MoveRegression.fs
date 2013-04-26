@@ -26,10 +26,10 @@ let processeddata = List.fold ( fun (worker, master) str ->
                     |> List.filter (fun x-> x <> [])
 
 //with checks
-let ret1  = testFunc (fun () -> (Array.Parallel.map (fun x -> testGame (List.rev x)) (Array.ofList processeddata) |> List.ofArray))
+//let ret1  = testFunc (fun () -> (Array.Parallel.map (fun x -> testGame (List.rev x)) (Array.ofList processeddata) |> List.ofArray))
 
 //without checks
-let ret2  = testFunc (fun () -> (Array.Parallel.map (fun x -> perfTest (List.rev x)) (Array.ofList processeddata) |> List.ofArray))
+//let ret2  = testFunc (fun () -> (Array.Parallel.map (fun x -> perfTest (List.rev x)) (Array.ofList processeddata) |> List.ofArray))
 
 //with checks
 let ret3  = testFunc (fun () -> (List.map (fun x -> testGame (List.rev x)) processeddata))
@@ -40,7 +40,7 @@ let ret4  = testFunc (fun () -> (List.map (fun x -> perfTest (List.rev x)) proce
 
 let aggregater n = List.forall (fun x-> x=true) n
 
-let results = List.map (fun (x,(y,z)) -> (x,aggregater y,z)) (("parallel",ret1)::("parallel unchecked",ret2)::("Series",ret3)::("series unchecked",ret4)::[])
+let results = List.map (fun (x,(y,z)) -> (x,aggregater y,z)) (("Series",ret3)::("series unchecked",ret4)::[])
 
 
 let MoveRegression () = results
