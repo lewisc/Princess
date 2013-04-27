@@ -99,7 +99,7 @@ type GameState =
               mutable AvailableMoves:((Ply []) Lazy);
               mutable Index:int;
               mutable WhitePieces:(Pieces * Position) list;
-              mutable BlackPieces:(Pieces*Position) list;
+              mutable BlackPieces:(Pieces * Position) list;
               mutable ZobristHash:int64;
               mutable State:Incrementor;
               mutable Value:Score;
