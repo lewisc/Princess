@@ -1,7 +1,11 @@
 CC=gcc -Wall -Wextra -Werror -O4 -I headers -L binaries
 debug=-g
 
-all  : binaries/globals.o binaries/movehelpers.o
+all  : binaries/globals.o binaries/movehelpers.o binaries/movecalculation.o
+
+binaries/movecalculation.o : binaries movecalculation.c movecalculation.h binaries/movehelpers.o
+	$(CC) -o binaries/movecalculation.o -c -I binaries -L binaries  movecalculation.c
+	cp movecalculation.h headers
 
 binaries/movehelpers.o : binaries movehelpers.c movehelpers.h binaries/globals.o
 	$(CC) -o binaries/movehelpers.o -c -I binaries -L binaries  movehelpers.c

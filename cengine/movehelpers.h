@@ -2,6 +2,8 @@
 #define PRINCESSMOVEHELPERS
 #include "elements.h"
 
+#define isvalid(x,y) (x >=0 && x < COLS && y >= 0 && y < ROWS)
+
 //prints a move
 //needs an array of length 13
 void moveToString(char * const, Move const);
