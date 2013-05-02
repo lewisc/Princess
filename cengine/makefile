@@ -1,4 +1,4 @@
-CC=gcc -Wall -Wextra -Werror -O4 -I headers -L binaries
+CC=gcc-4.8 -std=c99 -fuse-linker-plugin -Wpedantic -Wall -Wextra -Werror -O3 -I headers -flto -L binaries
 debug=-g
 
 all  : binaries/globals.o binaries/movehelpers.o binaries/movecalculation.o

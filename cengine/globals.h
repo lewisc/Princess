@@ -16,6 +16,6 @@ extern BoardElements board[30];
 extern GameState currentstate;
 
 //exception handling
-void exception(char const * const, int const);
+void exception(char const * const restrict, int const);
 
 #endif

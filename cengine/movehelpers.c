@@ -6,7 +6,7 @@
 
 //prints a move
 //needs an array of length 13
-void moveToString(char * const retval,Move const move)
+void moveToString(char * const restrict retval,Move const move)
 {
     if(sprintf(retval,"((%d,%d),(%d,%d))",move.from.xval,move.from.yval,move.to.xval,move.to.yval) < 0)
     {
@@ -117,7 +117,7 @@ PieceList getPiecesByColor(Color const color)
 }
 //prints the board to a string
 //the input should be an array of length 31
-void boardToString(char * const retval)
+void boardToString(char * const restrict retval)
 {
     int c, r;
     //iterate over the rows and columns 

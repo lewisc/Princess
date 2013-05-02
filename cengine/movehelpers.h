@@ -6,7 +6,7 @@
 
 //prints a move
 //needs an array of length 13
-void moveToString(char * const, Move const);
+void moveToString(char * const restrict, Move const);
 //prints a color
 char colorToString(Color const color);
 //turns a piece into a character
@@ -20,6 +20,6 @@ PieceList getPiecesByColor(Color const color);
 bool isterminal();
 //prints the board to a string
 //the input should be an array of length 31
-void boardToString(char * const retval);
+void boardToString(char * const restrict retval);
 
 #endif

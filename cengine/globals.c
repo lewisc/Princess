@@ -19,7 +19,7 @@ BoardElements const squares[13] = {wking,wqueen,wbishop,wknight,
                                    bqueen, bbishop, bknight,brook};
 GameState currentstate;
 
-void exception(char const * const errormessage, int const errnum)
+void exception(char const * const restrict errormessage, int const errnum)
 {
     printf("error was: %s",errormessage);
     exit(errnum);
