@@ -1,6 +1,6 @@
-#include "headers/elements.h"
-#include "headers/movehelpers.h"
-#include "headers/globals.h"
+#include "elements.h"
+#include "movehelpers.h"
+#include "globals.h"
 #include "movecalculation.h"
 
 //helper function to update the move list

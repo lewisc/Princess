@@ -115,6 +115,19 @@ PieceList getPiecesByColor(Color const color)
     }
     return retval;
 }
+
+//reverses the color
+Color notColor(Color const col)
+{
+    switch(col)
+    {
+        case white: return black;
+        case black: return white;
+        default:
+            exception("notcolor sent invalid value", 3);
+            return white;
+    }
+}
 //prints the board to a string
 //the input should be an array of length 31
 void boardToString(char * const restrict retval)

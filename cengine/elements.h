@@ -81,9 +81,11 @@ typedef struct
 {
     Color turn;
     bool playing;
-    MoveList AvailableMoves;
+    MoveList * availablemoves;
     int movecount;
+    //can't be empty
     PieceList whitepieces;
+    //can't be empty
     PieceList blackpieces;
     long int zobristhash;
     Score incrementor;
@@ -93,11 +95,14 @@ typedef struct
 //everything needed to perform an undo
 typedef struct
 {
-    MoveList oldmoves;
-    PieceList blackpieces;
-    PieceList whitepieces;
+    MoveList * oldmoves;
+    //can be empty
+    BoardPiece cappedpiece;
+    //can't be empty
+    BoardPiece frompiece;
     long int oldhash;
     Score oldscore;
+    int oldvalue;
 } UndoState;
     
 #endif

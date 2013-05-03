@@ -21,5 +21,7 @@ bool isterminal();
 //prints the board to a string
 //the input should be an array of length 31
 void boardToString(char * const restrict retval);
+//reverses the color
+Color notColor(Color const);
 
 #endif
