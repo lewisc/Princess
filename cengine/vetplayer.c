@@ -87,6 +87,6 @@ int main(int const argc, char const * const restrict * const restrict argv)
     }
 
     
-    exit(0);
+    fclose(inputfile);
     return 0;
 }
