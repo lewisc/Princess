@@ -23,6 +23,7 @@ let processeddata = List.fold ( fun (worker, master) str ->
                                     | ReadInput x -> (x::worker, master)
                                     | _ -> ([], worker::master)) ([],[]) testdata
                     |> fun (x,y) -> x::y
+                    //this is unneccessary I think
                     |> List.filter (fun x-> x <> [])
 
 //with checks

@@ -23,5 +23,7 @@ bool isterminal();
 void boardToString(char * const restrict retval);
 //reverses the color
 Color notColor(Color const);
+//resets the board state
+void reset();
 
 #endif

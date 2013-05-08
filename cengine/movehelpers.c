@@ -8,7 +8,7 @@
 //needs an array of length 13
 void moveToString(char * const restrict retval,Move const move)
 {
-    if(sprintf(retval,"((%d,%d),(%d,%d))",move.from.xval,move.from.yval,move.to.xval,move.to.yval) < 0)
+    if(sprintf(retval,"!%d%d-%d%d",move.from.xval,move.from.yval,move.to.xval,move.to.yval) < 0)
     {
         exception("move to string failed", 3);
     }
@@ -129,22 +129,68 @@ Color notColor(Color const col)
     }
 }
 //prints the board to a string
-//the input should be an array of length 31
+//the input should be an array of length 37
 void boardToString(char * const restrict retval)
 {
     int c, r;
+    int index=0;
     //iterate over the rows and columns 
-    for(c=0; c<COLS;++c)
+    for(r=0; r<ROWS;++r,++index)
     {
-        for(r=0;r<ROWS; ++r)
+        for(c=0;c<COLS; ++c)
         {
-            retval[RowCol(c,r)] = pieceToString(board[RowCol(c,r)]);
+            retval[RowCol(c,r)+index]= pieceToString(board[RowCol(c,r)]);
         }
+        retval[RowCol(c,r)+index]='\n';
     }
-    retval[31] = 0x0;
+    retval[37] = 0x0;
 }
 //determines if the game has ended
 bool isterminal()
 {
     return (currentstate.playing && (currentstate.movecount < GAMELENGTH));
+}
+//resets the board to an initial state
+void reset()
+{
+    board[0] = wking;
+    board[1] = wqueen;
+    board[2] = wbishop;
+    board[3] = wknight;
+    board[4] = wrook;
+    board[5] = wpawn;
+    board[6] = wpawn;
+    board[7] = wpawn;
+    board[8] = wpawn;
+    board[9] = wpawn;
+    board[10] = empty;
+    board[11] = empty;
+    board[12] = empty;
+    board[13] = empty;
+    board[14] = empty;
+    board[15] = empty;
+    board[16] = empty;
+    board[17] = empty;
+    board[18] = empty;
+    board[19] = empty;
+    board[20] = bpawn;
+    board[21] = bpawn;
+    board[22] = bpawn;
+    board[23] = bpawn;
+    board[24] = bpawn;
+    board[25] = bking;
+    board[26] = bqueen;
+    board[27] = bbishop;
+    board[28] = bknight;
+    board[29] = brook;
+
+    currentstate.turn=white;
+    currentstate.playing=true;
+    currentstate.availablemoves=NULL;
+    currentstate.movecount=1;
+    currentstate.whitepieces=getPiecesByColor(white);
+    currentstate.blackpieces=getPiecesByColor(black);
+    currentstate.zobristhash=0;
+    currentstate.incrementor=(Score){.whitescore=0,.blackscore=0,.advancementscore=0,.whitepawnscore=0,.blackpawnscore=0};
+    currentstate.value=0;
 }

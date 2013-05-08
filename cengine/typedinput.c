@@ -3,6 +3,7 @@
 #include "stdbool.h"
 #include "typedinput.h"
 #include "stdlib.h"
+#include "stdio.h"
 
 //the regular expression and a boolean declaring whether
 //it exists yet or not
@@ -47,7 +48,8 @@ bool readinput(char const * const restrict movestring, Move * const restrict ret
     {
         //extended posix regular expressions
         //escaped escape characters
-        int compiled = regcomp(&move, "!\\s?([a-e])([1-6])-([a-e])([1-6])",REG_EXTENDED);
+        printf("%s","!([a-e])([1-6])-([a-e])([1-6])");
+        int compiled = regcomp(&move, "!([a-e])([1-6])-([a-e])([1-6])",REG_EXTENDED);
         if(compiled)
         {
             exception("failed to compile move regex", 1);        
@@ -58,8 +60,8 @@ bool readinput(char const * const restrict movestring, Move * const restrict ret
             enabled = true;
         }
    }
-   regmatch_t matches[4];
-   int exec = regexec(&move,movestring,4,matches,0); 
+   regmatch_t matches[5];
+   int exec = regexec(&move,movestring,5,matches,0); 
    if(exec)
    {
         //failed to match or other error
@@ -67,10 +69,11 @@ bool readinput(char const * const restrict movestring, Move * const restrict ret
    }
    else
    {
-       retval->from.xval = stringToInt(movestring[matches[0].rm_so]);
-       retval->from.yval = stringToInt(movestring[matches[1].rm_so]);
-       retval->to.xval = stringToInt(movestring[matches[2].rm_so]);
-       retval->to.yval = stringToInt(movestring[matches[3].rm_so]);
+      
+       retval->from.xval = stringToInt(movestring[matches[1].rm_so]);
+       retval->from.yval = stringToInt(movestring[matches[2].rm_so]);
+       retval->to.xval = stringToInt(movestring[matches[3].rm_so]);
+       retval->to.yval = stringToInt(movestring[matches[4].rm_so]);
        return true;
    }
 }

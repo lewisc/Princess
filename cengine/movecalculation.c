@@ -13,11 +13,22 @@ static inline void updateMoveList(MoveList * const restrict retval, Position con
 }
 
 //returns true if the position is takeable or empty by the color
-static inline bool emptyOrTake(Position const pos, Color const toplay)
+static inline bool emptyOrTake(int const xval, int const yval, Color const toplay)
 {
-    if(isvalid(pos.xval+2,pos.yval-1) && ((board[RowCol(pos.xval+2,pos.yval-1)] == empty) || (getColor(board[RowCol(pos.xval+2,pos.yval-1)]) != toplay)))
+    if(isvalid(xval,yval))
     {
-        return true;
+        if(board[RowCol(xval,yval)] == empty)
+        {
+            return true;
+        }
+        else if(getColor(board[RowCol(xval,yval)]) != toplay)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     else
     {
@@ -28,15 +39,22 @@ static inline bool emptyOrTake(Position const pos, Color const toplay)
 //updates the list if the position is takeable, returns true if you should continue, false otherwise
 static inline bool continueOrUpdate(MoveList * const restrict retval, Position const pos, Color const toplay, int const i, int const j)
 {
-        if(isvalid(pos.xval+i,pos.yval+j) && (board[RowCol(pos.xval+i,pos.yval+j)] == empty))
+        if(isvalid(pos.xval+i,pos.yval+j))
         {
-            updateMoveList(retval, pos, i, j);
-            return true;
-        }
-        else if(getColor(board[RowCol(pos.xval+i,pos.yval+j)]) != toplay)
-        {
-            updateMoveList(retval, pos, i, j);
-            return false;
+            if(board[RowCol(pos.xval+i,pos.yval+j)] == empty)
+            {
+                updateMoveList(retval, pos, i, j);
+                return true;
+            }
+            else if(getColor(board[RowCol(pos.xval+i,pos.yval+j)]) != toplay)
+            {
+                updateMoveList(retval, pos, i, j);
+                return false;
+            }
+            else
+            {
+                return false;
+            }
         }
         else
         {
@@ -51,35 +69,35 @@ static void getKnightMoves(Position const pos, MoveList * const restrict retval)
     Color const toplay = getColor(board[RowCol(pos.xval,pos.yval)]);
     //move has to be valid, either empty or a valid take
     //+2+1, +1+2, -2-1, -1-2, -1+2, +1-2,-2+1, +2-1
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval+2,pos.yval+1,toplay))
     {
         updateMoveList(retval, pos, 2, 1);
     }
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval+1,pos.yval+2,toplay))
     {
         updateMoveList(retval, pos, 1, 2);
     }
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval-2,pos.yval-1,toplay))
     {
         updateMoveList(retval, pos, -2, -1);
     }
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval-1,pos.yval-2,toplay))
     {
         updateMoveList(retval, pos, -1, -2);
     }
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval-1,pos.yval+2,toplay))
     {
         updateMoveList(retval, pos, -1, 2);
     }
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval+1,pos.yval-2,toplay))
     {
         updateMoveList(retval, pos, 1, -2);
     }
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval-2,pos.yval+1,toplay))
     {
         updateMoveList(retval, pos, -2, 1);
     }
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval+2,pos.yval-1,toplay))
     {
         updateMoveList(retval, pos, 2, -1);
     }
@@ -92,11 +110,11 @@ static void getPawnMoves(Position const pos, MoveList * const restrict retval)
     //going "forward" is different if you are black or white
     int const advance = (toplay == white) ? 1 : -1;
     //attack at advance+1,advance-1, move at advance
-    if(isvalid(pos.xval+advance,pos.yval+1) && (!(board[RowCol(pos.xval+advance,pos.yval+1)] == empty) || (getColor(board[RowCol(pos.xval+advance,pos.yval+1)]) != toplay)))
+    if(isvalid(pos.xval+advance,pos.yval+1) && ((board[RowCol(pos.xval+advance,pos.yval+1)] != empty) && (getColor(board[RowCol(pos.xval+advance,pos.yval+1)]) != toplay)))
     {
         updateMoveList(retval, pos, advance, -1);
     }
-    if(isvalid(pos.xval+advance,pos.yval-1) && (!(board[RowCol(pos.xval+advance,pos.yval-1)] == empty) || (getColor(board[RowCol(pos.xval+advance,pos.yval-1)]) != toplay)))
+    if(isvalid(pos.xval+advance,pos.yval-1) && ((board[RowCol(pos.xval+advance,pos.yval-1)] != empty) && (getColor(board[RowCol(pos.xval+advance,pos.yval-1)]) != toplay)))
     {
         updateMoveList(retval, pos, advance, -1);
     }
@@ -111,35 +129,35 @@ static void getKingMoves(Position const pos, MoveList * const restrict retval)
     Color const toplay = getColor(board[RowCol(pos.xval,pos.yval)]);
     //move has to be valid, either empty or a valid take
     //+1+1, +1+0, +0+1, +1-1,-1+1,-1-1, -1+0, +0-1
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval+1,pos.yval+1,toplay))
     {
         updateMoveList(retval, pos, 1, 1);
     }
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval+1,pos.yval+0,toplay))
     {
         updateMoveList(retval, pos, 1, 0);
     }
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval+0,pos.yval+1,toplay))
     {
         updateMoveList(retval, pos, 0, 1);
     }
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval+1,pos.yval-1,toplay))
     {
         updateMoveList(retval, pos, 1, -1);
     }
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval-1,pos.yval+1,toplay))
     {
         updateMoveList(retval, pos, -1, 1);
     }
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval-1,pos.yval-1,toplay))
     {
         updateMoveList(retval, pos, -1, -1);
     }
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval-1,pos.yval+0,toplay))
     {
         updateMoveList(retval, pos, -1, 0);
     }
-    if(emptyOrTake(pos,toplay))
+    if(emptyOrTake(pos.xval+0,pos.yval-1,toplay))
     {
         updateMoveList(retval, pos, 0, -1);
     }

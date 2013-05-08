@@ -1,4 +1,5 @@
 #include "stdlib.h"
+#include "makemoves.h"
 #include "elements.h"
 #include "globals.h"
 #include "movehelpers.h"
@@ -69,21 +70,45 @@ void doupdate(Move const move, UndoState * const restrict undo)
     {
         removePieceFromList(getColor(cappiece), move.to);
     }
+    //remove the piece that was advanced
+    removePieceFromList(getColor(movepiece), move.from);
 
     //from square is empty
     board[RowCol(move.from.xval,move.from.yval)] = empty;
     //promote to queen or move piece
+    //and add the new piece into the list
     if(movepiece == wpawn && move.to.yval == (ROWS-1))
     {
         board[RowCol(move.to.xval,move.to.yval)] = wqueen;
+        currentstate.whitepieces.pieces[currentstate.whitepieces.count].piece = wqueen;
+        currentstate.whitepieces.pieces[currentstate.whitepieces.count].pos.xval = move.to.xval;
+        currentstate.whitepieces.pieces[currentstate.whitepieces.count].pos.yval = move.to.yval;
+        ++currentstate.whitepieces.count;
     }
     else if(movepiece == bpawn && move.to.yval == 0)
     {
         board[RowCol(move.to.xval,move.to.yval)] = bqueen;
+        currentstate.blackpieces.pieces[currentstate.blackpieces.count].piece = bqueen;
+        currentstate.blackpieces.pieces[currentstate.blackpieces.count].pos.xval = move.to.xval;
+        currentstate.blackpieces.pieces[currentstate.blackpieces.count].pos.yval = move.to.yval;
+        ++currentstate.blackpieces.count;
     }
     else
     {
         board[RowCol(move.to.xval,move.to.yval)] = movepiece;
+        switch(getColor(movepiece))
+        {
+            case white: currentstate.whitepieces.pieces[currentstate.whitepieces.count].piece = wqueen;
+                        currentstate.whitepieces.pieces[currentstate.whitepieces.count].pos.xval = move.to.xval;
+                        currentstate.whitepieces.pieces[currentstate.whitepieces.count].pos.yval = move.to.yval;
+                        ++currentstate.whitepieces.count;
+                    break;
+            case black: currentstate.blackpieces.pieces[currentstate.blackpieces.count].piece = bqueen;
+                        currentstate.blackpieces.pieces[currentstate.blackpieces.count].pos.xval = move.to.xval;
+                        currentstate.blackpieces.pieces[currentstate.blackpieces.count].pos.yval = move.to.yval;
+                        ++currentstate.blackpieces.count;
+                    break;
+        }
     }
 
     //update the zobrist
@@ -95,6 +120,7 @@ void doupdate(Move const move, UndoState * const restrict undo)
     //currentstate.value;
 }
 
+//undoes an applied move
 void undoupdate(UndoState const * const restrict undo)
 {
     //unfold all the direct elements of the undo struct
