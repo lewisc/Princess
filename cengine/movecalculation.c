@@ -110,17 +110,17 @@ static void getPawnMoves(Position const pos, MoveList * const restrict retval)
     //going "forward" is different if you are black or white
     int const advance = (toplay == white) ? 1 : -1;
     //attack at advance+1,advance-1, move at advance
-    if(isvalid(pos.xval+advance,pos.yval+1) && ((board[RowCol(pos.xval+advance,pos.yval+1)] != empty) && (getColor(board[RowCol(pos.xval+advance,pos.yval+1)]) != toplay)))
+    if(isvalid(pos.xval+1,pos.yval+advance) && ((board[RowCol(pos.xval+1,pos.yval+advance)] != empty) && (getColor(board[RowCol(pos.xval+1,pos.yval+advance)]) != toplay)))
     {
-        updateMoveList(retval, pos, advance, -1);
+        updateMoveList(retval, pos, +1, advance);
     }
-    if(isvalid(pos.xval+advance,pos.yval-1) && ((board[RowCol(pos.xval+advance,pos.yval-1)] != empty) && (getColor(board[RowCol(pos.xval+advance,pos.yval-1)]) != toplay)))
+    if(isvalid(pos.xval-1,pos.yval+advance) && ((board[RowCol(pos.xval-1,pos.yval+advance)] != empty) && (getColor(board[RowCol(pos.xval-1,pos.yval+advance)]) != toplay)))
     {
-        updateMoveList(retval, pos, advance, -1);
+        updateMoveList(retval, pos, -1, advance);
     }
-    if(isvalid(pos.xval+advance,pos.yval) && (board[RowCol(pos.xval+advance,pos.yval)] == empty))
+    if(isvalid(pos.xval,pos.yval+advance) && (board[RowCol(pos.xval,pos.yval+advance)] == empty))
     {
-        updateMoveList(retval, pos, advance, 0);
+        updateMoveList(retval, pos, 0, advance);
     }
 }
 
@@ -169,7 +169,7 @@ static void getRookMoves(Position const pos, MoveList * const restrict retval)
     Color const toplay = getColor(board[RowCol(pos.xval,pos.yval)]);
     int i;
     //scan +x,-x,+y,-y
-    for(i=1;(pos.xval+i)<ROWS;++i)
+    for(i=1;(pos.xval+i)<COLS;++i)
     {
         if(continueOrUpdate(retval, pos, toplay, i, 0) == false)
         {
@@ -183,7 +183,7 @@ static void getRookMoves(Position const pos, MoveList * const restrict retval)
             break;
         }
     }
-    for(i=1;(pos.yval+i)<COLS;++i)
+    for(i=1;(pos.yval+i)<ROWS;++i)
     {
         if(continueOrUpdate(retval, pos, toplay, 0, i) == false)
         {
@@ -204,7 +204,7 @@ static void getQueenMoves(Position const pos, MoveList * const restrict retval)
     Color const toplay = getColor(board[RowCol(pos.xval,pos.yval)]);
     int i ,j;
     //scan +i+0,-i+0, +0+i, +0-i, +i+i, +i-i, -i+i, -i-i
-    for(i=1;(pos.xval+i)<ROWS;++i)
+    for(i=1;(pos.xval+i)<COLS;++i)
     {
         if(continueOrUpdate(retval, pos, toplay, i, 0) == false)
         {
@@ -218,42 +218,42 @@ static void getQueenMoves(Position const pos, MoveList * const restrict retval)
             break;
         }
     }
-    for(i=1;(pos.yval+i)<COLS;++i)
+    for(i=1;(pos.yval+i)<ROWS;++i)
     {
         if(continueOrUpdate(retval, pos, toplay, 0, i) == false)
         {
             break;
         }
     }
-    for(i=pos.yval-1;i>=0;--i)
+    for(i=-1;(pos.yval+i)>=0;--i)
     {
         if(continueOrUpdate(retval, pos, toplay, 0, i) == false)
         {
             break;
         }
     }
-    for(i=1,j=1;(pos.xval+i)<ROWS && (pos.yval+j)<COLS; ++i,++j)
+    for(i=1,j=1;(pos.xval+i)<COLS && (pos.yval+j)<ROWS; ++i,++j)
     {
         if(continueOrUpdate(retval, pos, toplay, i, j) == false)
         {
             break;
         }
     }
-    for(i=1,j=-1;(pos.xval+i)<ROWS && (pos.yval+j)>=0; ++i,--j)
+    for(i=1,j=-1;(pos.xval+i)<COLS && (pos.yval+j)>=0; ++i,--j)
     {
         if(continueOrUpdate(retval, pos, toplay, i, j) == false)
         {
             break;
         }
     }
-    for(i=1,j=-1;(pos.xval+i)<ROWS && (pos.yval+j)>=0; ++i,--j)
+    for(i=-1,j=1;(pos.xval+i)>=0 && (pos.yval+j)<ROWS; --i,++j)
     {
         if(continueOrUpdate(retval, pos, toplay, i, j) == false)
         {
             break;
         }
     }
-    for(i=-1,j=-1;(pos.xval+i)<ROWS && (pos.yval+j)>=0; --i,--j)
+    for(i=-1,j=-1;(pos.xval+i)>= 0 && (pos.yval+j)>=0; --i,--j)
     {
         if(continueOrUpdate(retval, pos, toplay, i, j) == false)
         {
@@ -267,28 +267,28 @@ static void getBishopMoves(Position const pos, MoveList * const restrict retval)
     Color const toplay = getColor(board[RowCol(pos.xval,pos.yval)]);
     int i, j;
     //+i+j,+i-j,-i+j, -i-j, nocapture +1+0,+0+1, -1+0,+0-1
-    for(i=1,j=1;(pos.xval+i)<ROWS && (pos.yval+j)<COLS; ++i,++j)
+    for(i=1,j=1;(pos.xval+i)<COLS && (pos.yval+j)<ROWS; ++i,++j)
     {
         if(continueOrUpdate(retval, pos, toplay, i, j) == false)
         {
             break;
         }
     }
-    for(i=1,j=-1;(pos.xval+i)<ROWS && (pos.yval+j)>=0; ++i,--j)
+    for(i=1,j=-1;(pos.xval+i)<COLS && (pos.yval+j)>=0; ++i,--j)
     {
         if(continueOrUpdate(retval, pos, toplay, i, j) == false)
         {
             break;
         }
     }
-    for(i=1,j=-1;(pos.xval+i)<ROWS && (pos.yval+j)>=0; ++i,--j)
+    for(i=-1,j=1;(pos.xval+i)>=0 && (pos.yval+j)<ROWS; --i,++j)
     {
         if(continueOrUpdate(retval, pos, toplay, i, j) == false)
         {
             break;
         }
     }
-    for(i=-1,j=-1;(pos.xval+i)<ROWS && (pos.yval+j)>=0; --i,--j)
+    for(i=-1,j=-1;(pos.xval+i)>=0 && (pos.yval+j)>=0; --i,--j)
     {
         if(continueOrUpdate(retval, pos, toplay, i, j) == false)
         {
@@ -306,7 +306,7 @@ static void getBishopMoves(Position const pos, MoveList * const restrict retval)
     }
     if(isvalid(pos.xval,pos.yval+1) && (board[RowCol(pos.xval,pos.yval+1)] == empty))
     {
-        updateMoveList(retval, pos, 0, -1);
+        updateMoveList(retval, pos, 0, 1);
     }
     if(isvalid(pos.xval,pos.yval-1) && (board[RowCol(pos.xval,pos.yval-1)] == empty))
     {

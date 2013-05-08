@@ -98,12 +98,12 @@ void doupdate(Move const move, UndoState * const restrict undo)
         board[RowCol(move.to.xval,move.to.yval)] = movepiece;
         switch(getColor(movepiece))
         {
-            case white: currentstate.whitepieces.pieces[currentstate.whitepieces.count].piece = wqueen;
+            case white: currentstate.whitepieces.pieces[currentstate.whitepieces.count].piece = movepiece;
                         currentstate.whitepieces.pieces[currentstate.whitepieces.count].pos.xval = move.to.xval;
                         currentstate.whitepieces.pieces[currentstate.whitepieces.count].pos.yval = move.to.yval;
                         ++currentstate.whitepieces.count;
                     break;
-            case black: currentstate.blackpieces.pieces[currentstate.blackpieces.count].piece = bqueen;
+            case black: currentstate.blackpieces.pieces[currentstate.blackpieces.count].piece = movepiece;
                         currentstate.blackpieces.pieces[currentstate.blackpieces.count].pos.xval = move.to.xval;
                         currentstate.blackpieces.pieces[currentstate.blackpieces.count].pos.yval = move.to.yval;
                         ++currentstate.blackpieces.count;

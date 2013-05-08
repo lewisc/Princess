@@ -2,8 +2,8 @@
 #define PRINCESSGLOBALS
 #include "elements.h"
 
-//The index macro
-#define RowCol(c,r) c+(r*5)
+//The index function
+int RowCol(int const c, int const r);
 
 //Some useful values when dealing with the board
 #define COLS 5

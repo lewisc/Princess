@@ -4,6 +4,10 @@
 #include "stdbool.h"
 #include "stdio.h"
 
+bool isvalid(int const x, int const y)
+{
+    return ((x >= 0) && (x < COLS) && (y >= 0) && (y < ROWS));
+}
 //prints a move
 //needs an array of length 13
 void moveToString(char * const restrict retval,Move const move)
@@ -153,11 +157,11 @@ bool isterminal()
 //resets the board to an initial state
 void reset()
 {
-    board[0] = wking;
-    board[1] = wqueen;
+    board[0] = wrook;
+    board[1] = wknight;
     board[2] = wbishop;
-    board[3] = wknight;
-    board[4] = wrook;
+    board[3] = wqueen;
+    board[4] = wking;
     board[5] = wpawn;
     board[6] = wpawn;
     board[7] = wpawn;

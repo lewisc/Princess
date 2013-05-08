@@ -44,12 +44,11 @@ static int stringToInt(char const c)
 //populate the input value retval with the contents of the move
 bool readinput(char const * const restrict movestring, Move * const restrict retval)
 {
-    if(!enabled)
+    if(enabled == false)
     {
         //extended posix regular expressions
-        //escaped escape characters
-        printf("%s","!([a-e])([1-6])-([a-e])([1-6])");
-        int compiled = regcomp(&move, "!([a-e])([1-6])-([a-e])([1-6])",REG_EXTENDED);
+        //so we don't have to escape escaped escape characters
+        int compiled = regcomp(&move, "!\\s?([a-e])([1-6])-([a-e])([1-6])",REG_EXTENDED);
         if(compiled)
         {
             exception("failed to compile move regex", 1);        
