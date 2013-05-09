@@ -8,11 +8,25 @@ bool isvalid(int const x, int const y)
 {
     return ((x >= 0) && (x < COLS) && (y >= 0) && (y < ROWS));
 }
+
+static char colchar(int const col)
+{
+    switch (col)
+    {
+        case 0: return 'a';
+        case 1: return 'b';
+        case 2: return 'c';
+        case 3: return 'd';
+        case 4: return 'e';
+        default :   exception("colchar had invalid input",-1);
+                    return 'z';
+    }
+}
 //prints a move
 //needs an array of length 13
 void moveToString(char * const restrict retval,Move const move)
 {
-    if(sprintf(retval,"!%d%d-%d%d",move.from.xval,move.from.yval,move.to.xval,move.to.yval) < 0)
+    if(sprintf(retval,"!%c%d-%c%d",colchar(move.from.xval),move.from.yval+1,colchar(move.to.xval),move.to.yval+1) < 0)
     {
         exception("move to string failed", 3);
     }
@@ -152,7 +166,7 @@ void boardToString(char * const restrict retval)
 //determines if the game has ended
 bool isterminal()
 {
-    return (currentstate.playing && (currentstate.movecount < GAMELENGTH));
+    return !(currentstate.playing && (currentstate.movecount < GAMELENGTH));
 }
 //resets the board to an initial state
 void reset()

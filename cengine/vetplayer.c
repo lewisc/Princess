@@ -11,7 +11,7 @@ int main(int const argc, char const * const restrict * const restrict argv)
 {
     FILE * const restrict inputfile = fopen(argv[1],"r");
     char moveline[30];
-    char boardstatestring[40];
+//    char boardstatestring[40];
     int i = 0;
     bool good;
     //char movetest[15];
@@ -31,6 +31,7 @@ int main(int const argc, char const * const restrict * const restrict argv)
     {
         int current = 0;
         //parse it and apply it while there is a move
+        currentstate.playing = false;
         while(fgets(moveline, 29, inputfile) != NULL)
         {
             ++current;
@@ -65,9 +66,9 @@ int main(int const argc, char const * const restrict * const restrict argv)
                 }
                 if(good == false)
                 {
-                    printf("there was a problem... %d %c\n",moves.count, pieceToString(board[RowCol(moveread.from.xval,moveread.from.yval)]));
+//                    printf("there was a problem... %d %c\n",moves.count, pieceToString(board[RowCol(moveread.from.xval,moveread.from.yval)]));
 //                    printf("boardstate:\n%s\n", (boardToString(boardstatestring),boardstatestring));
-                    printf("move: %s",moveline);
+//                    printf("move: %s",moveline);
                 }
 //                printf("board is:\n");
 //                printf("boardstate:\n%s\n", (boardToString(boardstatestring),boardstatestring));
@@ -76,10 +77,10 @@ int main(int const argc, char const * const restrict * const restrict argv)
             }
             else
             {
-                if(isterminal())
+                if(!isterminal())
                 {
-                    printf("Line: %s was found and was not terminal\n", moveline);
-                    printf("boardstate:\n%s\n", (boardToString(boardstatestring),boardstatestring));
+//                    printf("Line: %s was found and was not terminal\n", moveline);
+//                    printf("boardstate:\n%s\n", (boardToString(boardstatestring),boardstatestring));
                 }
                 reset();
             }
