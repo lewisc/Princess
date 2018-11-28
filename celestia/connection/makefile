@@ -10,12 +10,8 @@ binaries/IMCSConnection.dll : binaries IMCSConnection.fs
 binaries/ServerConnection.dll : binaries ServerConnection.fs binaries/IMCSConnection.dll
 	$(fsc) $(optimize) -a --out:binaries/ServerConnection.dll -r:Elements.dll -r:MoveHelpers.dll  -r:IMCSConnection.dll -r:ValidMoves.dll -r:TypedInput.dll ServerConnection.fs
 
-binaries : search/binaries
+binaries : 
 	mkdir -p binaries
-	cp search/binaries/* binaries
-
-search/binaries :
-	cd search && $(MAKE)
 
 clean : cleansearch
 	rm -rf binaries

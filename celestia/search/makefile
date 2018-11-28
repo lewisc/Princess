@@ -23,12 +23,8 @@ binaries/DepthFirstSearch.dll  : binaries DepthFirstSearch.fs
 binaries/MTDF.dll  : binaries MTDF.fs binaries/AlphaBeta.dll
 	$(fsc) $(optimize) --out:binaries/MTDF.dll -a -r:MoveHelpers.dll -r:AlphaBeta.dll -r:Elements.dll -r:ValidMoves.dll -r:BoardConstants.dll -r:TranspositionTable.dll -r:DepthFirstSearch.dll MTDF.fs
 
-binaries : tables/binaries
+binaries :
 	mkdir -p binaries
-	cp tables/binaries/* binaries
-
-tables/binaries :
-	cd tables &&  $(MAKE)
 
 clean : cleantables
 	rm -rf binaries
