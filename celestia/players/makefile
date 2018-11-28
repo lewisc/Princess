@@ -10,15 +10,8 @@ binaries/RandomPlayer.exe : binaries RandomPlayer.fs
 binaries/NetworkPlayer.exe : binaries RandomPlayer.fs 
 	$(fsc) $(optimize) --standalone --out:binaries/NetworkPlayer.exe -r:IMCSConnection.dll  -r:Elements.dll -r:ValidMoves.dll -r:AlphaBeta.dll -r:DepthFirstSearch.dll -r:Heuristics.dll -r:MTDF.dll -r:TranspositionTable.dll -r:AlphaBetaID.dll -r:ServerConnection.dll NetPlayer.fs
 
-binaries : connection/binaries
+binaries :
 	mkdir -p binaries
-	cp connection/binaries/* binaries
 
-connection/binaries : 
-	cd connection && $(MAKE)
-
-clean : cleanconnection
+clean :
 	rm -rf binaries
-
-cleanconnection : 
-	cd connection && $(MAKE) clean

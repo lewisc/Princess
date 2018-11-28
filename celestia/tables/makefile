@@ -11,11 +11,5 @@ binaries/TranspositionTable.dll  : binaries TranspositionTable.fs
 binaries : 
 	mkdir -p binaries
 
-board/binaries :
-	cd board && $(MAKE)
-
-clean : cleanboard
+clean :
 	rm -rf binaries
-
-cleanboard :
-	cd board && $(MAKE) clean

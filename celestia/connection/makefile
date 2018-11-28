@@ -13,12 +13,5 @@ binaries/ServerConnection.dll : binaries ServerConnection.fs binaries/IMCSConnec
 binaries : 
 	mkdir -p binaries
 
-clean : cleansearch
+clean :
 	rm -rf binaries
-
-cleansearch :
-	cd search && $(MAKE) clean
-
-   
-
-

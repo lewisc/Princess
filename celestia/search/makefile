@@ -26,8 +26,5 @@ binaries/MTDF.dll  : binaries MTDF.fs binaries/AlphaBeta.dll
 binaries :
 	mkdir -p binaries
 
-clean : cleantables
+clean :
 	rm -rf binaries
-
-cleantables :
-	cd tables && $(MAKE) clean
