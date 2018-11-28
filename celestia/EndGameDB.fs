@@ -49,3 +49,6 @@ module EndGameDB =
         seq { for i in pieces4 do
                 for (j,k,l,m) in positions4 do
                    yield  ((j,i.[0]),(k,i.[1]),(l,i.[2]),(m,i.[3]))}
+
+
+

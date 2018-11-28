@@ -19,17 +19,12 @@ binaries/RegressionRunner.exe : binaries RegressionRunner.fs binaries/TestTypes.
 binaries/DepthFirstSearchRegression.dll : binaries DepthFirstSearch.fs binaries/TestTypes.dll
 	$(fsc) $(optimize) -a --out:binaries/DepthFirstSearchRegression.dll -r:IMCSConnection.dll  -r:Elements.dll -r:ValidMoves.dll -r:AlphaBeta.dll -r:DepthFirstSearch.dll -r:Heuristics.dll -r:MTDF.dll -r:TranspositionTable.dll -r:AlphaBetaID.dll -r:ServerConnection.dll -r:TestTypes.dll DepthFirstSearch.fs
 
-binaries : players/binaries config/binaries
+binaries : players/binaries
 	mkdir -p binaries
 	cp players/binaries/* binaries
-	cp config/binaries/* binaries
 
 players/binaries :
 	cd players && $(MAKE)
-
-config/binaries:
-	cd config &&  $(MAKE)
-
 
 clean : cleanconf cleanplayers
 	rm -rf binaries
