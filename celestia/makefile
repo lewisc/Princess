@@ -2,45 +2,156 @@ fsc=fsharpc --nologo --warn:5 -I:binaries
 optimize=--optimize+ --tailcalls+ --crossoptimize+
 debug=-g
 
-all  : binaries/DepthFirstSearchRegression.dll binaries/MoveRegression.dll binaries/TestTypes.dll binaries/RegressionRunner.exe binaries/EndGame.dll \
-       binaries/IMCSConnection.dll binaries/ServerConnection.dll \
-       binaries/ZobristKeys.dll binaries/ValidMoves.dll binaries/TypedInput.dll binaries/BoardConstants.dll binaries/Elements.dll \
-       binaries/AlphaBetaID.dll binaries/Heuristics.dll binaries/DepthFirstSearch.dll binaries/MTDF.dll binaries/Quiescence.dll binaries/AlphaBeta.dll \
-       binaries/RandomPlayer.exe binaries/NetworkPlayer.exe binaries/TranspositionTable.dll
+all  : binaries/DepthFirstSearchRegression.dll \
+       binaries/MoveRegression.dll \
+       binaries/TestTypes.dll \
+       binaries/RegressionRunner.exe \
+       binaries/EndGame.dll \
+       binaries/IMCSConnection.dll \
+       binaries/ServerConnection.dll \
+       binaries/ZobristKeys.dll \
+       binaries/ValidMoves.dll \
+       binaries/TypedInput.dll \
+       binaries/BoardConstants.dll \
+       binaries/Elements.dll \
+       binaries/AlphaBetaID.dll \
+       binaries/Heuristics.dll \
+       binaries/DepthFirstSearch.dll \
+       binaries/MTDF.dll \
+       binaries/Quiescence.dll \
+       binaries/AlphaBeta.dll \
+       binaries/RandomPlayer.exe \
+       binaries/NetworkPlayer.exe \
+       binaries/TranspositionTable.dll
 
-binaries/RandomPlayer.exe : binaries/MoveHelpers.dll binaries/Elements.dll binaries/ValidMoves.dll binaries/Heuristics.dll players/RandomPlayer.fs
-	$(fsc) $(optimize) --standalone --out:binaries/RandomPlayer.exe -r:MoveHelpers.dll -r:Elements.dll -r:ValidMoves.dll -r:Heuristics.dll players/RandomPlayer.fs
+# Main executables
+binaries/RandomPlayer.exe : binaries/MoveHelpers.dll \
+                            binaries/Elements.dll \
+                            binaries/ValidMoves.dll \
+                            binaries/Heuristics.dll \
+                            players/RandomPlayer.fs
+	$(fsc) $(optimize) -r:MoveHelpers.dll \
+                       -r:Elements.dll \
+                       -r:ValidMoves.dll \
+                       -r:Heuristics.dll\
+                       --standalone \
+                       --out:binaries/RandomPlayer.exe \
+                       players/RandomPlayer.fs
 
-binaries/NetworkPlayer.exe : binaries/IMCSConnection.dll binariesElements.dll binaries/ValidMoves.dll binaries/AlphaBeta.dll binaries/DepthFirstSearch.dll \
-                             binaries/Heuristics.dll binaries/MTDF.dll binaries/TranspositionTable.dll binaries/AlphaBetaID.dll binaries/ServerConnection.dll players/NetPlayer.fs
-	$(fsc) $(optimize) --standalone --out:binaries/NetworkPlayer.exe -r:IMCSConnection.dll  -r:Elements.dll -r:ValidMoves.dll -r:AlphaBeta.dll \
-                       -r:DepthFirstSearch.dll -r:Heuristics.dll -r:MTDF.dll -r:TranspositionTable.dll -r:AlphaBetaID.dll -r:ServerConnection.dll players/NetPlayer.fs
-	
-binaries/DepthFirstSearchRegression.dll : binaries/IMCSConnection.dll binaries/Elements.dll binaries/Validmoves.dll binaries/AlphaBeta.dll \
-                                          binaries/DepthFirstSearch.dll binaries/Heuristics.dll binaries/MTDF.dll binaries/TranspositionTable.dll \
-                                          binaries/AlphaBetaID.dll binaries/ServerConnection.dll binaries/TestTypes.dll DepthFirstSearch.fs
-	$(fsc) $(optimize) -a --out:binaries/DepthFirstSearchRegression.dll -r:IMCSConnection.dll  -r:Elements.dll \
-                       -r:ValidMoves.dll -r:AlphaBeta.dll -r:DepthFirstSearch.dll -r:Heuristics.dll -r:MTDF.dll -r:TranspositionTable.dll -r:AlphaBetaID.dll -r:ServerConnection.dll -r:TestTypes.dll DepthFirstSearch.fs
+binaries/NetworkPlayer.exe : binaries/IMCSConnection.dll \
+                             binariesElements.dll \
+                             binaries/ValidMoves.dll \
+                             binaries/AlphaBeta.dll \
+                             binaries/DepthFirstSearch.dll \
+                             binaries/Heuristics.dll \
+                             binaries/MTDF.dll \
+                             binaries/TranspositionTable.dll \
+                             binaries/AlphaBetaID.dll \
+                             binaries/ServerConnection.dll \
+                             players/NetPlayer.fs
+	$(fsc) $(optimize) -r:IMCSConnection.dll \
+                       -r:Elements.dll \
+                       -r:ValidMoves.dll \
+                       -r:AlphaBeta.dll \
+                       -r:DepthFirstSearch.dll \
+                       -r:Heuristics.dll \
+                       -r:MTDF.dll \
+                       -r:TranspositionTable.dll \
+                       -r:AlphaBetaID.dll \
+                       -r:ServerConnection.dll \
+                       --standalone \
+                       --out:binaries/NetworkPlayer.exe \
+                       players/NetPlayer.fs
+
+binaries/RegressionRunner.exe : binaries/IMCSConnection.dll \
+                                binaries/Elements.dll \
+                                binaries/ValidMoves.dll \
+                                binaries/AlphaBeta.dll \
+                                binaries/DepthFirstSearch.dll \
+                                binaries/Heuristics.dll \
+                                binaries/MTDF.dll \
+                                binaries/TranspositionTable.dll \
+                                binaries/AlphaBetaID.dll \
+                                binaries/ServerConnection.dll \
+                                binaries/TestTypes.dll \
+                                binaries/MoveRegression.dll \
+                                binaries/TypedInput.dll \
+                                binaries/DepthFirstSearchRegression.dll \
+                                binaries/BoardConstants.dll \
+                                binaries/ZobristKeys.dll \
+                                Resources.dll \
+                                RegressionRunner.fs 
+	$(fsc) $(optimize) -r:binaries/IMCSConnection.dll  \
+                       -r:binaries/Elements.dll \
+                       -r:binaries/ValidMoves.dll \
+                       -r:binaries/AlphaBeta.dll \
+                       -r:binaries/DepthFirstSearch.dll \
+                       -r:binaries/Heuristics.dll \
+                       -r:binaries/MTDF.dll  \
+                       -r:binaries/TranspositionTable.dll \
+                       -r:binaries/AlphaBetaID.dll  \
+                       -r:binaries/ServerConnection.dll \
+                       -r:binaries/TestTypes.dll \
+                       -r:binaries/MoveRegression.dll \
+                       -r:binaries/TypedInput.dll \
+                       -r:binaries/DepthFirstSearchRegression.dll \
+                       -r:binaries/BoardConstants.dll \
+                       -r:binaries/ZobristKeys.dll \
+                       -r:Resources.dll \
+                       --standalone \
+                       --out:binaries/RegressionRunner.exe \
+                       RegressionRunner.fs 
+
+
+# top level dll's
+binaries/DepthFirstSearchRegression.dll : binaries/IMCSConnection.dll \
+                                          binaries/Elements.dll \
+                                          binaries/Validmoves.dll \
+                                          binaries/AlphaBeta.dll \
+                                          binaries/DepthFirstSearch.dll \
+                                          binaries/Heuristics.dll \
+                                          binaries/MTDF.dll \
+                                          binaries/TranspositionTable.dll \
+                                          binaries/AlphaBetaID.dll \
+                                          binaries/ServerConnection.dll \
+                                          binaries/TestTypes.dll \
+                                          DepthFirstSearch.fs
+	$(fsc) $(optimize) -r:binaries/IMCSConnection.dll \
+                       -r:binaries/Elements.dll \
+                       -r:binaries/ValidMoves.dll \
+                       -r:binaries/AlphaBeta.dll \
+                       -r:binaries/DepthFirstSearch.dll \
+                       -r:binaries/Heuristics.dll \
+                       -r:binaries/MTDF.dll \
+                       -r:binaries/TranspositionTable.dll \
+                       -r:binaries/AlphaBetaID.dll \
+                       -r:binaries/ServerConnection.dll \
+                       -r:binaries/TestTypes.dll \
+                       -a \
+                       --out:binaries/DepthFirstSearchRegression.dll \
+                       DepthFirstSearch.fs
 
 binaries/MoveRegression.dll : binaries/Elements.dll binaries/ValidMoves.dll binaries/TestTypes.dll binaries/TypedInput.dll binaries/Resources.dll MoveRegression.fs
-	$(fsc) $(optimize) -a--out:binaries/MoveRegression.dll -r:Elements.dll -r:ValidMoves.dll -r:TestTypes.dll -r:TypedInput.dll -r:Resources.dll MoveRegression.fs
+	$(fsc) $(optimize) -a --out:binaries/MoveRegression.dll -r:Elements.dll -r:ValidMoves.dll -r:TestTypes.dll -r:TypedInput.dll -r:Resources.dll MoveRegression.fs
 
+
+# Endgame Db dll's
 binaries/EndGame.dll : binaries/Heuristics.dll binaries/Elements.dll binaries/ValidMoves.dll binaries/AlphaBeta.dll binaries/BoardConstants.dll endgame/EndGameDB.fs
 	$(fsc) $(optimize) -a  --out:binaries/EndGame.dll -r:Heuristics.dll -r:Elements.dll -r:ValidMoves.dll  -r:AlphaBeta.dll -r:BoardConstants.dll endgame/EndGameDB.fs
 
-binaries/RegressionRunner.exe : binaries/IMCSConnection.dll  binaries/Elements.dll binaries/ValidMoves.dll binaries/AlphaBeta.dll binaries/DepthFirstSearch.dll binaries/Heuristics.dll binaries/MTDF.dll binaries/TranspositionTable.dll binaries/AlphaBetaID.dll binaries/ServerConnection.dll binaries/TestTypes.dll binaries/MoveRegression.dll binaries/TypedInput.dll binaries/DepthFirstSearchRegression.dll binaries/BoardConstants.dll binaries/Resources.dll binaries/ZobristKeys.dll RegressionRunner.fs 
-	$(fsc) $(optimize) --standalone --out:binaries/RegressionRunner.exe -r:IMCSConnection.dll  -r:Elements.dll -r:ValidMoves.dll -r:AlphaBeta.dll -r:DepthFirstSearch.dll -r:Heuristics.dll -r:MTDF.dll -r:TranspositionTable.dll -r:AlphaBetaID.dll -r:ServerConnection.dll -r:TestTypes.dll -r:MoveRegression.dll -r:TypedInput.dll -r:DepthFirstSearchRegression.dll -r:BoardConstants.dll -r:Resources.dll -r:ZobristKeys.dll RegressionRunner.fs 
 
-binaries/ZobristKeys.dll : binaries/Elements.dll binaries binaries/BoardConstants.dll ZobristKeys.fs
+
+# board dll's
+binaries/ZobristKeys.dll : binaries/Elements.dll binaries/BoardConstants.dll board/ZobristKeys.fs
 	$(fsc) $(optimize) -a --out:binaries/ZobristKeys.dll -r:Elements.dll -r:BoardConstants.dll ZobristKeys.fs
 
-binaries/ValidMoves.dll : binaries binaries/TypedInput.dll ValidMoves.fs binaries/Elements.dll binaries/ZobristKeys.dll binaries/BoardConstants.dll binaries/MoveHelpers.dll binaries/MoveGen.dll
-	$(fsc) $(optimize) -a --out:binaries/ValidMoves.dll -r:TypedInput.dll -r:Elements.dll -r:ZobristKeys.dll -r:BoardConstants.dll -r:MoveHelpers.dll -r:MoveGen.dll ValidMoves.fs
+binaries/ValidMoves.dll : binaries/TypedInput.dll binaries/Elements.dll binaries/ZobristKeys.dll binaries/BoardConstants.dll binaries/MoveHelpers.dll binaries/MoveGen.dll board/ValidMoves.fs 
+	$(fsc) $(optimize) -a --out:binaries/ValidMoves.dll -r:TypedInput.dll -r:Elements.dll -r:ZobristKeys.dll -r:BoardConstants.dll -r:MoveHelpers.dll -r:MoveGen.dll board/ValidMoves.fs
 
-binaries/MoveGen.dll : binaries/Elements.dll binaries MoveGen.fs binaries/BoardConstants.dll binaries/ZobristKeys.dll binaries/TypedInput.dll binaries/MoveHelpers.dll
-	$(fsc) $(optimize) -a --out:binaries/MoveGen.dll -r:MoveHelpers.dll -r:Elements.dll -r:BoardConstants.dll -r:ZobristKeys.dll -r:TypedInput.dll MoveGen.fs
+binaries/MoveGen.dll : binaries/Elements.dll binaries/BoardConstants.dll binaries/ZobristKeys.dll binaries/TypedInput.dll binaries/MoveHelpers.dll board/MoveGen.fs
+	$(fsc) $(optimize) -a --out:binaries/MoveGen.dll -r:MoveHelpers.dll -r:Elements.dll -r:BoardConstants.dll -r:ZobristKeys.dll -r:TypedInput.dll board/MoveGen.fs
 
-binaries/MoveHelpers.dll : binaries/Elements.dll binaries MoveHelpers.fs binaries/BoardConstants.dll binaries/ZobristKeys.dll binaries/TypedInput.dll
+binaries/MoveHelpers.dll : binaries/Elements.dll MoveHelpers.fs binaries/BoardConstants.dll binaries/ZobristKeys.dll binaries/TypedInput.dll
 	$(fsc) $(optimize) -a --out:binaries/MoveHelpers.dll -r:Elements.dll -r:BoardConstants.dll -r:ZobristKeys.dll -r:TypedInput.dll MoveHelpers.fs
 
 binaries/BoardConstants.dll : binaries/Elements.dll binaries BoardConstants.fs
