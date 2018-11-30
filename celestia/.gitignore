@@ -1,2 +1,3 @@
 *.dll
-binaries
+*.exe
+*.swp
