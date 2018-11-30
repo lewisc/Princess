@@ -3,7 +3,6 @@ open System
 open IMCS
 open MoveGeneration
 open BoardCombinators
-open Config.Properties
 open Searching
 open Heuristics
 open BoardCombinators

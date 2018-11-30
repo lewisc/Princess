@@ -4,7 +4,7 @@ open MoveGeneration
 open BoardCombinators
 open TypedInput
 open TestTypes
-open Config.Properties
+open System.IO
 
 open System.Threading.Tasks
 open System.Linq
@@ -13,7 +13,7 @@ open System.Linq
 //split on newlines
 let splitchars = [| '\n';'\r'|]
 //turn it int a list and filtor out any empty strings
-let testdata = List.ofArray <| (Resources.testdata).Split(splitchars)
+let testdata = List.ofArray <| File.ReadAllLines(@"testdata/testdata.txt")
                |> List.filter (fun x -> if x = "" then false else true)
 
 
