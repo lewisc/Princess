@@ -6,6 +6,19 @@ search_all : binaries/DepthFirstSearch.dll \
              binaries/MTDF.dll \
              binaries/AlphaBeta.dll
 
+binaries/MTDF.dll : binaries/AlphaBeta.dll \
+                    search/MTDF.fs
+	$(fsc) $(optimize) -r:MoveHelpers.dll \
+                     -r:AlphaBeta.dll \
+                     -r:Elements.dll \
+                     -r:ValidMoves.dll \
+                     -r:BoardConstants.dll \
+                     -r:TranspositionTable.dll \
+                     -r:DepthFirstSearch.dll \
+                     -a \
+                     --out:binaries/MTDF.dll \
+                     search/MTDF.fs
+
 binaries/Heuristics.dll : binaries/Elements.dll \
                            binaries/ValidMoves.dll \
                            binaries/MoveHelpers.dll \
