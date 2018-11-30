@@ -96,7 +96,6 @@ binaries/RegressionRunner.exe : binaries/IMCSConnection.dll \
                        -r:binaries/DepthFirstSearchRegression.dll \
                        -r:binaries/BoardConstants.dll \
                        -r:binaries/ZobristKeys.dll \
-                       -r:Resources.dll \
                        --standalone \
                        --out:binaries/RegressionRunner.exe \
                        RegressionRunner.fs 
@@ -105,7 +104,7 @@ binaries/RegressionRunner.exe : binaries/IMCSConnection.dll \
 # top level dll's
 binaries/DepthFirstSearchRegression.dll : binaries/IMCSConnection.dll \
                                           binaries/Elements.dll \
-                                          binaries/Validmoves.dll \
+                                          binaries/ValidMoves.dll \
                                           binaries/AlphaBeta.dll \
                                           binaries/DepthFirstSearch.dll \
                                           binaries/Heuristics.dll \
@@ -139,7 +138,6 @@ binaries/MoveRegression.dll : binaries/Elements.dll \
                        -r:binaries/ValidMoves.dll \
                        -r:binaries/TestTypes.dll \
                        -r:binaries/TypedInput.dll \
-                       -r:Resources.dll \
                        -a \
                        --out:binaries/MoveRegression.dll \
                        MoveRegression.fs
@@ -171,7 +169,7 @@ binaries/ZobristKeys.dll : binaries/Elements.dll \
                        -r:binaries/BoardConstants.dll  \
                        -a \
                        --out:binaries/ZobristKeys.dll \
-                       ZobristKeys.fs
+                       board/ZobristKeys.fs
 
 binaries/ValidMoves.dll : binaries/TypedInput.dll \
                           binaries/Elements.dll \
@@ -208,40 +206,40 @@ binaries/MoveGen.dll : binaries/Elements.dll \
 binaries/MoveHelpers.dll : binaries/Elements.dll \
                            binaries/BoardConstants.dll \
                            binaries/ZobristKeys.dll \
-                           binaries/TypedInput.dll
-                           MoveHelpers.fs \
+                           binaries/TypedInput.dll\
+                           board/MoveHelpers.fs 
 	$(fsc) $(optimize) -r:binaries/Elements.dll \
                        -r:binaries/BoardConstants.dll \
                        -r:binaries/ZobristKeys.dll \
                        -r:binaries/TypedInput.dll \
                        -a \
                        --out:binaries/MoveHelpers.dll \
-                       MoveHelpers.fs
+                       board/MoveHelpers.fs
 
 binaries/BoardConstants.dll : binaries/Elements.dll \
-                              BoardConstants.fs
+                              board/BoardConstants.fs
 	$(fsc) $(optimize) -r:binaries/Elements.dll \
                        -a \
                        --out:binaries/BoardConstants.dll \
-                       BoardConstants.fs
+                       board/BoardConstants.fs
 
 binaries/TranspositionTable.dll : binaries/Elements.dll \
                                    binaries/ValidMoves.dll \
                                    binaries/ZobristKeys.dll \
-                                   TranspositionTable.fs 
+                                   tables/TranspositionTable.fs 
 	$(fsc) $(optimize) -r:binaries/Elements.dll \
                        -r:binaries/ValidMoves.dll \
                        -r:binaries/ZobristKeys.dll \
                        -a \
                        --out:binaries/TranspositionTable.dll \
-                       TranspositionTable.fs
+                       tables/TranspositionTable.fs
 
 binaries/ServerConnection.dll : binaries/Elements.dll \
-                                binaries/MovieHelpers.dll \
+                                binaries/MoveHelpers.dll \
                                 binaries/IMCSConnection.dll \
                                 binaries/ValidMoves.dll \
                                 binaries/TypedInput.dll \
-                                ServerConnection.fs 
+                                connection/ServerConnection.fs 
 	$(fsc) $(optimize) -r:binaries/Elements.dll \
                        -r:binaries/MoveHelpers.dll \
                        -r:binaries/IMCSConnection.dll \
@@ -249,36 +247,37 @@ binaries/ServerConnection.dll : binaries/Elements.dll \
                        -r:binaries/TypedInput.dll \
                         -a \
                        --out:binaries/ServerConnection.dll \
-                       ServerConnection.fs
+                       connection/ServerConnection.fs
 
 binaries/Heuristics.dll : binaries/Elements.dll \
                            binaries/ValidMoves.dll \
                            binaries/MoveHelpers.dll \
-                           binaries/Heuristics.fs
+                           search/Heuristics.fs
 	$(fsc) $(optimize) -r:binaries/Elements.dll \
                        -r:binaries/ValidMoves.dll \
                        -r:binaries/MoveHelpers.dll \
                        -a \
                        --out:binaries/Heuristics.dll \
-                       Heuristics.fs
+                       search/Heuristics.fs
 
 binaries/Quiescence.dll : binaries/MoveHelpers.dll \
                            binaries/Elements.dll \
                            binaries/ValidMoves.dll \
-                           Quiescence.fs
+                           search/Quiescence.fs
 	$(fsc) $(optimize) -r:binaries/MoveHelpers.dll \
                        -r:binaries/Elements.dll \
                        -r:binaries/ValidMoves.dll \
                        -a \
                        --out:binaries/Quiescence.dll \
-                       Quiescence.fs
+                       search/Quiescence.fs
 
 binaries/AlphaBeta.dll : binaries/MoveHelpers.dll \
                           binaries/DepthFirstSearch.dll \
-                          binaries/Elements.dll Quiescence.dll \
+                          binaries/Elements.dll \
+                          binaries/Quiescence.dll \
                           binaries/ValidMoves.dll \
                           binaries/TranspositionTable.dll \
-                          AlphaBeta2.fs
+                          search/AlphaBeta2.fs
 	$(fsc) $(optimize) -r:binaries/MoveHelpers.dll \
                        -r:binaries/DepthFirstSearch.dll \
                        -r:binaries/Elements.dll \
@@ -287,7 +286,7 @@ binaries/AlphaBeta.dll : binaries/MoveHelpers.dll \
                        -r:binaries/TranspositionTable.dll \
                        -a \
                        --out:binaries/AlphaBeta.dll \
-                       AlphaBeta2.fs
+                       search/AlphaBeta2.fs
 
 binaries/AlphaBetaID.dll : binaries/MoveHelpers.dll \
                            binaries/DepthFirstSearch.dll \
@@ -296,7 +295,7 @@ binaries/AlphaBetaID.dll : binaries/MoveHelpers.dll \
                            binaries/ValidMoves.dll \
                            binaries/AlphaBeta.dll \
                            binaries/TranspositionTable.dll \
-                           AlphaBetaID.fs
+                           search/AlphaBetaID.fs
 	$(fsc) $(optimize) -r:binaries/MoveHelpers.dll \
                        -r:binaries/DepthFirstSearch.dll \
                        -r:binaries/Elements.dll \
@@ -306,18 +305,18 @@ binaries/AlphaBetaID.dll : binaries/MoveHelpers.dll \
                        -r:binaries/TranspositionTable.dll \
                        -a \
                         --out:binaries/AlphaBetaID.dll \
-                       AlphaBetaID.fs
+                       search/AlphaBetaID.fs
 
 binaries/DepthFirstSearch.dll : binaries/Elements.dll \
                                 binaries/ValidMoves.dll \
                                 binaries/MoveHelpers.dll \
-                                DepthFirstSearch.fs
+                                search/DepthFirstSearch.fs
 	$(fsc) $(optimize) -r:binaries/Elements.dll \
                        -r:binaries/ValidMoves.dll \
                        -r:binaries/MoveHelpers.dll \
                        -a \
-                       -out:binaries/DepthFirstSearch.dll \
-                       DepthFirstSearch.fs
+                       --out:binaries/DepthFirstSearch.dll \
+                       search/DepthFirstSearch.fs
 
 binaries/MTDF.dll : binaries/MoveHelpers.dll \
                     binaries/AlphaBeta.dll \
@@ -326,7 +325,7 @@ binaries/MTDF.dll : binaries/MoveHelpers.dll \
                     binaries/BoardConstants.dll \
                     binaries/TranspositionTable.dll \
                     binaries/DepthFirstSearch.dll \
-                    MTDF.fs
+                    search/MTDF.fs
 	$(fsc) $(optimize) -r:MoveHelpers.dll \
                        -r:AlphaBeta.dll \
                        -r:Elements.dll \
@@ -336,12 +335,12 @@ binaries/MTDF.dll : binaries/MoveHelpers.dll \
                        -r:DepthFirstSearch.dll \
                        -a \
                        --out:binaries/MTDF.dll \
-                       MTDF.fs
+                       search/MTDF.fs
 
-binaries/Elements.dll : Elements.fs
+binaries/Elements.dll : board/Elements.fs
 	$(fsc) $(optimize) -a \
                        --out:binaries/Elements.dll \
-                       Elements.fs
+                       board/Elements.fs
 
 binaries/TestTypes.dll : TestTypes.fs
 	$(fsc) $(optimize) -a \
