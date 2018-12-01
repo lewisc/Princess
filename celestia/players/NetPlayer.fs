@@ -16,7 +16,6 @@ let main args =
                   EvalInit = initialSimple;
                   SearchPrime = MTDFID;
                   SearchPonder = Ponderer;}
-    do getDiag 0L |>ignore
 
     use conn = new IMCSConnection(@"svcs.cs.pdx.edu",3589)
     let foo = connect conn

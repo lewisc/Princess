@@ -1,48 +1,56 @@
 ﻿namespace Books
-open MoveGeneration
-open System
-
-//3 cases, high cutoff, low cutoff, or exact
-type Transpose =
-        | Exact = 0
-        | Lower = 1
-        | Upper = 2
 
 
-type Contents= {mutable depth:int;mutable value:int; mutable strength:Transpose;mutable Hash:int64;mutable IsValid:bool;mutable Turn:Color}
-
+//This Module represents a transposition table using a Zobrist hashkey
+//This is mutable code (effectively a database)
+//TODO: Convert this to a class
 module TranspositionTable =
+
+    open MoveGeneration
+    open System
+
+    //3 cases, high cutoff, low cutoff, or exact
+    type Transpose =
+            | Exact = 0
+            | Lower = 1
+            | Upper = 2
+
+    //the information necessary to determine if the transpose
+    //can be used (i.e. if the cache is valid)
+    type Contents = {mutable depth:int;
+                     mutable value:int;
+                     mutable strength:Transpose;
+                     mutable hashValue:int64;
+                     mutable isValid:bool;
+                     mutable turn:Color}
+
+    //Arbitrary number of rows in table, not tuned at all
     [<Literal>]
-    let private tableSize = 2000000
+    let private TableSize = 2000000
 
-    let (localTable:Contents []) = let ret = Array.create tableSize {depth=0;value=0;strength=Transpose.Exact;Hash=0L;IsValid=false;Turn=White}
-                                   for i in 0..(tableSize-1) do
-                                        ret.[i] <- {depth=0;value=0;strength=Transpose.Exact;Hash=0L;IsValid=false;Turn=White}
-                                   ret
+    let (localTable:Contents []) = 
+        Array.create TableSize {depth=0;
+                                value=0;
+                                strength=Transpose.Exact;
+                                hashValue=0L;
+                                isValid=false;
+                                turn=White}
 
-    let getDiag (hash:int64) =
-        let retval = localTable.[abs(int32(hash))%tableSize]
-        match retval with
-        | t when t.Hash = hash -> Some(t)
+    //Getters and setters for transpositions
+    let getTranspose (hashValue:int64) depth turn = 
+        match localTable.[abs(int32(hashValue))%TableSize] with
+        | t when t.depth >= depth
+              && t.hashValue = hashValue
+              && t.isValid
+              && turn = t.turn ->
+                  Some((t.strength, (t.value)))
         | _ -> None
 
-
-    let getTranspose (hash:int64) depth turn = 
-        match localTable.[abs(int32(hash))%tableSize] with
-        | t -> match (t.strength) with
-               | Transpose.Exact when t.depth >= depth
-                            && hash = t.Hash && t.IsValid && turn = t.Turn-> Some((Transpose.Exact,(t.value)))
-               | Transpose.Lower when t.depth >= depth
-                                   && hash = t.Hash && t.IsValid && turn = t.Turn -> Some((Transpose.Lower,(t.value)))
-               | Transpose.Upper when t.depth >= depth
-                                    && hash = t.Hash && t.IsValid && turn = t.Turn -> Some((Transpose.Upper,(t.value)))
-               | _ -> None
-
-    let setTranspose (hash:int64) value flag depth turn=
-                    match localTable.[abs(int32(hash))%tableSize] with
-                    | t ->  do t.Hash <- hash
+    let setTranspose (hashValue:int64) value flag depth turn =
+                    match localTable.[abs(int32(hashValue))%TableSize] with
+                    | t ->  do t.hashValue <- hashValue
                             do t.strength <- flag
                             do t.value <- value
                             do t.depth <- depth
-                            do t.IsValid<- true
-                            do t.Turn <- turn
+                            do t.isValid<- true
+                            do t.turn <- turn
