@@ -1,16 +1,16 @@
-endgamedb_all : binaries/EndGame.dll
+endgamedb_all : $(libs)/EndGame.dll
 
-binaries/EndGame.dll : binaries/Heuristics.dll \
-                       binaries/Elements.dll \
-                       binaries/ValidMoves.dll \
-                       binaries/AlphaBeta.dll \
-                       binaries/BoardConstants.dll \
-                       endgamedb/EndGameDB.fs
-	$(fsc) $(optimize) -r:binaries/Heuristics.dll \
-                       -r:binaries/Elements.dll \
-                       -r:binaries/ValidMoves.dll  \
-                       -r:binaries/AlphaBeta.dll \
-                       -r:binaries/BoardConstants.dll \
+$(libs)/EndGame.dll : $(libs)/Heuristics.dll \
+                      $(libs)/Elements.dll \
+                      $(libs)/ValidMoves.dll \
+                      $(libs)/AlphaBeta.dll \
+                      $(libs)/BoardConstants.dll \
+                      endgamedb/EndGameDB.fs
+	$(fsc) $(optimize) -r:Heuristics.dll \
+                       -r:Elements.dll \
+                       -r:ValidMoves.dll  \
+                       -r:AlphaBeta.dll \
+                       -r:BoardConstants.dll \
                        -a \
-                       --out:binaries/EndGame.dll \
+                       --out:$(libs)/EndGame.dll \
                        endgamedb/EndGameDB.fs

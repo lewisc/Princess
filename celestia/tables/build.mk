@@ -1,12 +1,12 @@
-tables_all : binaries/TranspositionTable.dll
+tables_all : $(libs)/TranspositionTable.dll
 
-binaries/TranspositionTable.dll : binaries/Elements.dll \
-                                   binaries/ValidMoves.dll \
-                                   binaries/ZobristKeys.dll \
-                                   tables/TranspositionTable.fs 
-	$(fsc) $(optimize) -r:binaries/Elements.dll \
-                       -r:binaries/ValidMoves.dll \
-                       -r:binaries/ZobristKeys.dll \
+$(libs)/TranspositionTable.dll : $(libs)/Elements.dll \
+                                 $(libs)/ValidMoves.dll \
+                                 $(libs)/ZobristKeys.dll \
+                                 tables/TranspositionTable.fs 
+	$(fsc) $(optimize) -r:Elements.dll \
+                       -r:ValidMoves.dll \
+                       -r:ZobristKeys.dll \
                        -a \
-                       --out:binaries/TranspositionTable.dll \
+                       --out:$(libs)/TranspositionTable.dll \
                        tables/TranspositionTable.fs

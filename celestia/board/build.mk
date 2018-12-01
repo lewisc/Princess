@@ -1,37 +1,37 @@
-board_all : binaries/BoardConstants.dll \
-            binaries/MoveHelpers.dll \
-            binaries/MoveGen.dll \
-            binaries/ValidMoves.dll \
-            binaries/ZobristKeys.dll \
-            binaries/TypedInput.dll \
-            binaries/Elements.dll
+board_all : $(libs)/BoardConstants.dll \
+            $(libs)/MoveHelpers.dll \
+            $(libs)/MoveGen.dll \
+            $(libs)/ValidMoves.dll \
+            $(libs)/ZobristKeys.dll \
+            $(libs)/TypedInput.dll \
+            $(libs)/Elements.dll
 
-binaries/Elements.dll : board/Elements.fs
+$(libs)/Elements.dll : board/Elements.fs
 	$(fsc) $(optimize) -a \
-                       --out:binaries/Elements.dll \
+                       --out:$(libs)/Elements.dll \
                        board/Elements.fs
 
-binaries/TypedInput.dll : board/TypedInput.fs
+$(libs)/TypedInput.dll : board/TypedInput.fs
 	$(fsc) $(optimize) -a \
-                       --out:binaries/TypedInput.dll \
+                       --out:$(libs)/TypedInput.dll \
                        board/TypedInput.fs
 
-binaries/ZobristKeys.dll : binaries/Elements.dll \
-                           binaries/BoardConstants.dll \
-                           board/ZobristKeys.fs
-	$(fsc) $(optimize) -r:binaries/Elements.dll \
-                       -r:binaries/BoardConstants.dll  \
+$(libs)/ZobristKeys.dll : $(libs)/Elements.dll \
+                          $(libs)/BoardConstants.dll \
+                          board/ZobristKeys.fs
+	$(fsc) $(optimize) -r:Elements.dll \
+                       -r:BoardConstants.dll  \
                        -a \
-                       --out:binaries/ZobristKeys.dll \
+                       --out:$(libs)/ZobristKeys.dll \
                        board/ZobristKeys.fs
 
-binaries/ValidMoves.dll : binaries/TypedInput.dll \
-                          binaries/Elements.dll \
-                          binaries/ZobristKeys.dll \
-                          binaries/BoardConstants.dll \
-                          binaries/MoveHelpers.dll \
-                          binaries/MoveGen.dll \
-                          board/ValidMoves.fs 
+$(libs)/ValidMoves.dll : $(libs)/TypedInput.dll \
+                         $(libs)/Elements.dll \
+                         $(libs)/ZobristKeys.dll \
+                         $(libs)/BoardConstants.dll \
+                         $(libs)/MoveHelpers.dll \
+                         $(libs)/MoveGen.dll \
+                         board/ValidMoves.fs 
 	$(fsc) $(optimize) -r:TypedInput.dll \
                        -r:Elements.dll \
                        -r:ZobristKeys.dll \
@@ -39,40 +39,40 @@ binaries/ValidMoves.dll : binaries/TypedInput.dll \
                        -r:MoveHelpers.dll \
                        -r:MoveGen.dll \
                        -a \
-                       --out:binaries/ValidMoves.dll \
+                       --out:$(libs)/ValidMoves.dll \
                        board/ValidMoves.fs
 
-binaries/MoveGen.dll : binaries/Elements.dll \
-                       binaries/BoardConstants.dll \
-                       binaries/ZobristKeys.dll \
-                       binaries/TypedInput.dll \
-                       binaries/MoveHelpers.dll \
-                       board/MoveGen.fs
+$(libs)/MoveGen.dll : $(libs)/Elements.dll \
+                      $(libs)/BoardConstants.dll \
+                      $(libs)/ZobristKeys.dll \
+                      $(libs)/TypedInput.dll \
+                      $(libs)/MoveHelpers.dll \
+                      board/MoveGen.fs
 	$(fsc) $(optimize) -r:MoveHelpers.dll \
                        -r:Elements.dll \
                        -r:BoardConstants.dll \
                        -r:ZobristKeys.dll \
                        -r:TypedInput.dll \
                         -a \
-                       --out:binaries/MoveGen.dll \
+                       --out:$(libs)/MoveGen.dll \
                        board/MoveGen.fs
 
-binaries/MoveHelpers.dll : binaries/Elements.dll \
-                           binaries/BoardConstants.dll \
-                           binaries/ZobristKeys.dll \
-                           binaries/TypedInput.dll\
-                           board/MoveHelpers.fs 
-	$(fsc) $(optimize) -r:binaries/Elements.dll \
-                       -r:binaries/BoardConstants.dll \
-                       -r:binaries/ZobristKeys.dll \
-                       -r:binaries/TypedInput.dll \
+$(libs)/MoveHelpers.dll : $(libs)/Elements.dll \
+                          $(libs)/BoardConstants.dll \
+                          $(libs)/ZobristKeys.dll \
+                          $(libs)/TypedInput.dll\
+                          board/MoveHelpers.fs 
+	$(fsc) $(optimize) -r:Elements.dll \
+                       -r:BoardConstants.dll \
+                       -r:ZobristKeys.dll \
+                       -r:TypedInput.dll \
                        -a \
-                       --out:binaries/MoveHelpers.dll \
+                       --out:$(libs)/MoveHelpers.dll \
                        board/MoveHelpers.fs
 
-binaries/BoardConstants.dll : binaries/Elements.dll \
-                              board/BoardConstants.fs
-	$(fsc) $(optimize) -r:binaries/Elements.dll \
+$(libs)/BoardConstants.dll : $(libs)/Elements.dll \
+                             board/BoardConstants.fs
+	$(fsc) $(optimize) -r:Elements.dll \
                        -a \
-                       --out:binaries/BoardConstants.dll \
+                       --out:$(libs)/BoardConstants.dll \
                        board/BoardConstants.fs

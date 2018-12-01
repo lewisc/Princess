@@ -1,40 +1,40 @@
-players_all : binaries/RandomPlayer.exe \
-              binaries/NetworkPlayer.exe
+players_all : $(libs)/RandomPlayer.exe \
+              $(libs)/NetworkPlayer.exe
 
-binaries/RandomPlayer.exe : binaries/MoveHelpers.dll \
-                            binaries/Elements.dll \
-                            binaries/ValidMoves.dll \
-                            binaries/Heuristics.dll \
-                            players/RandomPlayer.fs
-	$(fsc) $(optimize) -r:binaries/MoveHelpers.dll \
-                       -r:binaries/Elements.dll \
-                       -r:binaries/ValidMoves.dll \
-                       -r:binaries/Heuristics.dll\
+$(libs)/RandomPlayer.exe : $(libs)/MoveHelpers.dll \
+                           $(libs)/Elements.dll \
+                           $(libs)/ValidMoves.dll \
+                           $(libs)/Heuristics.dll \
+                           players/RandomPlayer.fs
+	$(fsc) $(optimize) -r:MoveHelpers.dll \
+                       -r:Elements.dll \
+                       -r:ValidMoves.dll \
+                       -r:Heuristics.dll\
                        --standalone \
-                       --out:binaries/RandomPlayer.exe \
+                       --out:$(bin)/RandomPlayer.exe \
                        players/RandomPlayer.fs
 
-binaries/NetworkPlayer.exe : binaries/IMCSConnection.dll \
-                             binaries/Elements.dll \
-                             binaries/ValidMoves.dll \
-                             binaries/AlphaBeta.dll \
-                             binaries/DepthFirstSearch.dll \
-                             binaries/Heuristics.dll \
-                             binaries/MTDF.dll \
-                             binaries/TranspositionTable.dll \
-                             binaries/AlphaBetaID.dll \
-                             binaries/ServerConnection.dll \
-                             players/NetPlayer.fs
-	$(fsc) $(optimize) -r:binaries/IMCSConnection.dll \
-                       -r:binaries/Elements.dll \
-                       -r:binaries/ValidMoves.dll \
-                       -r:binaries/AlphaBeta.dll \
-                       -r:binaries/DepthFirstSearch.dll \
-                       -r:binaries/Heuristics.dll \
-                       -r:binaries/MTDF.dll \
-                       -r:binaries/TranspositionTable.dll \
-                       -r:binaries/AlphaBetaID.dll \
-                       -r:binaries/ServerConnection.dll \
+$(libs)/NetworkPlayer.exe : $(libs)/IMCSConnection.dll \
+                            $(libs)/Elements.dll \
+                            $(libs)/ValidMoves.dll \
+                            $(libs)/AlphaBeta.dll \
+                            $(libs)/DepthFirstSearch.dll \
+                            $(libs)/Heuristics.dll \
+                            $(libs)/MTDF.dll \
+                            $(libs)/TranspositionTable.dll \
+                            $(libs)/AlphaBetaID.dll \
+                            $(libs)/ServerConnection.dll \
+                            players/NetPlayer.fs
+	$(fsc) $(optimize) -r:IMCSConnection.dll \
+                       -r:Elements.dll \
+                       -r:ValidMoves.dll \
+                       -r:AlphaBeta.dll \
+                       -r:DepthFirstSearch.dll \
+                       -r:Heuristics.dll \
+                       -r:MTDF.dll \
+                       -r:TranspositionTable.dll \
+                       -r:AlphaBetaID.dll \
+                       -r:ServerConnection.dll \
                        --standalone \
-                       --out:binaries/NetworkPlayer.exe \
+                       --out:$(bin)/NetworkPlayer.exe \
                        players/NetPlayer.fs
