@@ -1,9 +1,12 @@
 ﻿namespace MoveGeneration
-open BoardConstants
-open System
-open System.Collections.Generic
 
+// Zobrist key gneration
 module ZobristKeys =
+
+    open BoardConstants
+    open System
+    open System.Collections.Generic
+
     let piecesOption = Array.append [|None|] (Array.map (fun x-> Some(x)) (allPieces ()))
     let pieceXPosition = Array.concat (Array.map (fun x -> (Array.map (fun y -> x,y ) allPositions)) piecesOption)
 

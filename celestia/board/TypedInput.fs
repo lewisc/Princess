@@ -1,7 +1,10 @@
 ﻿namespace MoveGeneration
-open System.Text
-open System.Text.RegularExpressions
+
 module TypedInput =
+
+    open System.Text
+    open System.Text.RegularExpressions
+
     //active pattern for regex parsing
     //Shamelessly cribbed from MSDN
     //http://msdn.microsoft.com/en-us/library/dd233248.aspx

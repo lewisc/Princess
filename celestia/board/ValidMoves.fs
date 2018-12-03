@@ -1,14 +1,15 @@
 ﻿//Lewis Coates (c) April 7, 2011                                                
 namespace MoveGeneration
-open System
-open TypedInput
-open ZobristKeys
-open BoardConstants
-open BoardHelpers
-open MoveCalculation
 
 
 module BoardCombinators=
+
+    open System
+    open TypedInput
+    open ZobristKeys
+    open BoardConstants
+    open BoardHelpers
+    open MoveCalculation
 
     ///undoes an update given an input
     let inline undoUpdate input prevstate=
