@@ -1,8 +1,8 @@
-﻿namespace Searching
-open MoveGeneration.BoardCombinators
-open Books.TranspositionTable
+﻿namespace Celestia
+open BoardCombinators
+open TranspositionTable
 open System.Diagnostics
-open MoveGeneration
+open Primitives
 open AlphaBeta2
 open DepthFirstSearch
 open BoardHelpers

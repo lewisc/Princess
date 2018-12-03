@@ -1,18 +1,17 @@
 ﻿//Lewis Coates (c) April 7, 2011
 //Simplest player, plays purely random moves
+namespace Celestia
 
-namespace Celestia.Players
+open System
+open System.IO
+
+open BoardCombinators
+open Primitives
+open Heuristics
+open BoardHelpers
 
 
 module TestLoop =
-
-    open System
-    open System.IO
-
-    open MoveGeneration
-    open BoardCombinators
-    open Searching.Heuristics
-    open BoardHelpers
 
     [<EntryPoint>]
     //Play random moves, print to a file.

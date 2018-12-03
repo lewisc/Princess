@@ -1,20 +1,18 @@
 ﻿//(c) Lewis Coates 2018
 //A network player to play minichess
 
-namespace Celestia.Players
+namespace Celestia
+open Actions
+open System
+open AlphaBeta2
+open AlphaBetaID
+open MTDF
+open DepthFirstSearch
+open TranspositionTable
+open Heuristics
 
 module NetworkPlayer =
 
-    open IMCS
-    open Actions
-    open System
-    open Searching
-    open AlphaBeta2
-    open AlphaBetaID
-    open MTDF
-    open DepthFirstSearch
-    open Books.TranspositionTable
-    open Heuristics
 
     [<EntryPoint>]
     let main args =

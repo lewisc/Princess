@@ -1,4 +1,4 @@
-﻿namespace IMCS
+﻿namespace Celestia
 
 open System
 open System.IO

@@ -1,7 +1,8 @@
-﻿namespace Searching
-open MoveGeneration
+﻿namespace Celestia
+
 open BoardCombinators
 open BoardHelpers
+open Primitives
 
 module Quiescence =
     

@@ -1,6 +1,8 @@
 ﻿//Lewis Coates (c) April 7, 2011                                                
-namespace MoveGeneration
+namespace Celestia
 open System
+
+open Primitives
 open TypedInput
 open ZobristKeys
 open BoardConstants

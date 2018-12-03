@@ -1,4 +1,4 @@
-﻿namespace MoveGeneration
+﻿namespace Celestia
 open System.Text
 open System.Text.RegularExpressions
 module TypedInput =

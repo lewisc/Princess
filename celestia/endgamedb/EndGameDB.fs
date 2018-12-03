@@ -1,10 +1,9 @@
-﻿namespace Books
+﻿namespace Celestia
 open System.Runtime.Serialization.Formatters.Binary
 open System.Runtime.Serialization
-open MoveGeneration
 open BoardCombinators
 open System
-open Searching.Heuristics
+open Heuristics
 open System.Collections.Generic
 open System.IO
 open BoardConstants

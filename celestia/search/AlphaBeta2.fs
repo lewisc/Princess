@@ -1,11 +1,12 @@
-﻿namespace Searching
+﻿namespace Celestia
+
 open DepthFirstSearch
-open MoveGeneration
 open BoardCombinators
-open Books
 open TranspositionTable
 open Quiescence
+open Primitives 
 open BoardHelpers
+
 open System.Diagnostics
 
 module AlphaBeta2 =

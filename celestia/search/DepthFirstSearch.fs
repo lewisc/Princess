@@ -1,19 +1,23 @@
-﻿namespace Searching
+﻿namespace Celestia
+
 open System.Diagnostics
-open MoveGeneration
+
 open BoardCombinators
 open BoardHelpers
+open Primitives
 
-exception SearchException of string
 
 module DepthFirstSearch =
+    exception SearchException of string
+
+
     let counter = ref 0
 
 
     let doUndoDfs driver depth game side =
         let movelist = game.AvailableMoves.Force()
         let maxmove = movelist.Length
-        let rec searcher depth side undoer (move,score) index=
+        let rec searcher depth side undoer (move, score) index=
             match index with
             | x -> 
                 let head = movelist.[x]
@@ -21,11 +25,11 @@ module DepthFirstSearch =
                 let (_,newtest) =  driver (depth-1) newgame -side
                 do undoUpdate game newundo
                 let testval = -newtest
-                searcher depth side (Some(newundo)) (if testval > (score) then (head,testval) else (move,score)) (index+1)
+                searcher depth side (Some(newundo)) (if testval > (score) then (head, testval) else (move,score)) (index+1)
 
             | y when y >= maxmove  -> (move,score)
 
-        let ret = searcher depth side None (botMove,-inf-1000) 0
+        let ret = searcher depth side None (botMove, -inf-1000) 0
         ret
 
     let onPlay game = match game.Turn with 

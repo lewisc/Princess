@@ -1,24 +1,24 @@
-﻿namespace IMCS
+﻿namespace Celestia
 open System
 open System.IO
-open MoveGeneration
+
+open Primitives
 open BoardCombinators
 open TypedInput
 open BoardHelpers
 
-///used to determine whether the game is continuting  or someone has one
-type Status = | Inplay of Ply option
-              | End of Color
-
-[<NoEquality;NoComparison>]
-type Player = {EvalFun:Evaluator;
-               EvalInit:GameState->(int*Incrementor);
-               SearchPrime:int64->GameState->(Ply*Score);
-               SearchPonder:((unit->bool)->GameState->(Ply*Score));
-               }
-
               
 module Actions =
+    ///used to determine whether the game is continuting  or someone has one
+    type Status = | Inplay of Ply option
+                  | End of Color
+
+    [<NoEquality;NoComparison>]
+    type Player = {EvalFun:Evaluator;
+                   EvalInit:GameState->(int*Incrementor);
+                   SearchPrime:int64->GameState->(Ply*Score);
+                   SearchPonder:((unit->bool)->GameState->(Ply*Score));}
+
     ///attempts to read a single line from a connection, has a timeout
     ///of timeout milliseconds
     let readLine (connection:IMCSConnection) timeout =

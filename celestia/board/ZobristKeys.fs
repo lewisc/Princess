@@ -1,5 +1,7 @@
-﻿namespace MoveGeneration
+﻿namespace Celestia
 open BoardConstants
+open Primitives
+
 open System
 open System.Collections.Generic
 
