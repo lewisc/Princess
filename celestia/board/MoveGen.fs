@@ -1,15 +1,13 @@
 ﻿//Lewis Coates (c) April 7, 2011                                                
 namespace MoveGeneration
+open System
+open TypedInput
+open ZobristKeys
+open BoardConstants
+open BoardHelpers
 
 
 module MoveCalculation =
-
-    open System
-    open TypedInput
-    open ZobristKeys
-    open BoardConstants
-    open BoardHelpers
-
     //Everything except for the end main move generator is private for information leakage, operations should be performed
     //on lists of moves/arrays of moves, not exposing the internals of the move calculation
 

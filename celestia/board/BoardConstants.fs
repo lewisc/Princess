@@ -1,6 +1,4 @@
 ﻿namespace MoveGeneration
-
-
 module BoardConstants =
     ///0-Indexed Lenght of Board
     [<Literal>]

@@ -1,18 +1,17 @@
 ﻿//Lewis Coates (c) April 7, 2011                                                
 namespace MoveGeneration
+open System
+open TypedInput
+open ZobristKeys
+open BoardConstants
+
+///Invalid move exception
+[<NoEquality;NoComparison>]
+exception public InvalidMove of Ply * GameState
 
 
 module BoardHelpers =
-    open System
-    open TypedInput
-    open ZobristKeys
-    open BoardConstants
 
-    ///Invalid move exception
-    [<NoEquality;NoComparison>]
-    exception public InvalidMove of Ply * GameState
-
-    // infinity val, means one side haswon
     [<Literal>]
     let inf = 1000
 
