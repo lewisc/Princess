@@ -1,4 +1,6 @@
-﻿namespace Celestia
+﻿//(C) Lewis Coates
+namespace Celestia
+
 open BoardConstants
 open Primitives
 
@@ -6,7 +8,9 @@ open System
 open System.Collections.Generic
 
 module ZobristKeys =
+
     let piecesOption = Array.append [|None|] (Array.map (fun x-> Some(x)) (allPieces ()))
+
     let pieceXPosition = Array.concat (Array.map (fun x -> (Array.map (fun y -> x,y ) allPositions)) piecesOption)
 
     let rand = Random()

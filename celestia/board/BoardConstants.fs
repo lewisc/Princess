@@ -1,5 +1,7 @@
 ﻿namespace Celestia
+
 open Primitives
+
 module BoardConstants =
     ///0-Indexed Lenght of Board
     [<Literal>]

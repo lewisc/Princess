@@ -10,7 +10,6 @@ open Primitives
 open Heuristics
 open BoardHelpers
 
-
 module TestLoop =
 
     [<EntryPoint>]

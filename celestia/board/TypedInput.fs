@@ -1,6 +1,8 @@
 ﻿namespace Celestia
+
 open System.Text
 open System.Text.RegularExpressions
+
 module TypedInput =
     //active pattern for regex parsing
     //Shamelessly cribbed from MSDN

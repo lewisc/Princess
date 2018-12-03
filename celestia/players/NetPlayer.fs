@@ -1,7 +1,7 @@
 ﻿//(c) Lewis Coates 2018
 //A network player to play minichess
-
 namespace Celestia
+
 open Actions
 open System
 open AlphaBeta2

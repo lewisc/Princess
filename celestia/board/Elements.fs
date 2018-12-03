@@ -19,8 +19,8 @@ module Primitives =
 
     //Type of possible Players(white or black)
     type Color =
-         | Black
-         | White
+        | Black
+        | White
 
     //used for the IMCS server, and other diagnostics
     //needs to be captiol
