@@ -20,40 +20,38 @@ module TestLoop =
     //Requires an argument for a file to print to 
     let randPlayer args =
 
-        if args.Length < 1 then
-            printfn "requires a filename" 
-            0
+        //Get the output file or use default
+        let filename = if args.Length >= 1 then args.[0] else "output.file"
 
-        else
-            use printer = new StreamWriter(args.[1])
-            let max = 100
+        use printer = new StreamWriter(filename)
+        let max = 100
 
-            let rand = Random()
+        let rand = Random()
 
-            // Determine a random move to play
-            let randomMove (board:GameState) =
-                let moves = board.AvailableMoves.Force()
-                moves.[rand.Next(0, (moves.Length-1))]
+        // Determine a random move to play
+        let randomMove (board:GameState) =
+            let moves = board.AvailableMoves.Force()
+            moves.[rand.Next(0, (moves.Length-1))]
 
+        //play an entire game
+        let rec playEngine gameState = 
 
-            [1 .. max] |> List.map (fun i ->
+            //Determine a move, print it and apply it
+            let moveVal = randomMove gameState
+            printer.WriteLine(sprintMove moveVal)
+            let game = fst (doUpdate gameState (moveVal))
 
-                printer.WriteLine("=Game " + i.ToString())
-                printfn "%d" i
+            //Determine if the game is still playing, or if it's over
+            if game.IsPlaying then playEngine game else ()
 
-                //play an entire game
-                let rec playEngine gameState = 
+        // Run max games
+        [1 .. max] |> List.map (fun i ->
 
-                    //Determine a move, print it and apply it
-                    let moveVal = randomMove gameState
-                    printer.WriteLine(sprintMove moveVal)
-                    let game = fst (doUpdate gameState (moveVal))
+            printer.WriteLine("=Game " + i.ToString())
+            printfn "%d" i
 
-                    //Determine if the game is still playing, or if it's over
-                    if game.IsPlaying then playEngine game else ()
- 
-                //Start a game with 
-                playEngine (initialState SimpleCount initialSimple))
+            //Start a game with 
+            playEngine (initialState SimpleCount initialSimple))
 
-                |> ignore
-            0
+            |> ignore
+        0
