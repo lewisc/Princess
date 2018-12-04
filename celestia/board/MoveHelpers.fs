@@ -72,6 +72,12 @@ module BoardHelpers =
         let chars = [|'e';'d';'c';'b';'a'|]
         (sprintf "%c%d-%c%d"  (chars.[from2]) (from1+1) (chars.[to2]) (to1+1))
 
+    // generate a board from a given list of positions and pieces
+    let buildBoard (positions: ((int * int) * Pieces) list) =
+        let emptyBoard = array2D (List.init 6 (fun _ -> List.init 5 (fun _ -> None)))
+        List.map (fun ((x,y), piece) -> emptyBoard.[y, x] <- Some(piece)) positions |> ignore
+        emptyBoard
+
      //prints the ascii character representing the color, IMCS compliant
     let printColor col =
         match col with

@@ -31,12 +31,12 @@ module Primitives =
 
     //Different possible pieces
     type Pieces =
-         | Bishop of Color
-         | Pawn of Color
-         | Queen of Color
-         | Knight of Color
-         | Rook of Color
-         | King of Color
+        | Bishop of Color
+        | Pawn of Color
+        | Queen of Color
+        | Knight of Color
+        | Rook of Color
+        | King of Color
 
     //Print out a character representing the piece and it's color
     with  override self.ToString() = 

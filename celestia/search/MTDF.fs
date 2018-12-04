@@ -12,8 +12,6 @@ module MTDF =
     //a basic fixed depth MTD(f) algorithm
     let MTDF d (game:GameState) =
 
-        //diagnostic for a found bug, no reason to remove
-        assert( (game.IsPlaying) = true)
         //figure out what side we are playing as, used for
         //scoring purposes(best guess)
         let side = match game.Turn with

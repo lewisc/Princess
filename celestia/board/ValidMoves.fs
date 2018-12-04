@@ -155,6 +155,27 @@ module BoardCombinators=
         do newgame.State<-initinc
         newgame
 
+    let setState fitness start board color = 
+        let pieces =  piecesOfGame (board) color
+        let newgame = 
+           {Turn=color;
+            BoardState=board;
+            TimeOut=81;
+            IsPlaying=true;
+            Index=1;
+            BlackPieces=(piecesOfGame (board) Black);
+            WhitePieces=(piecesOfGame (board) White);
+            AvailableMoves=lazy(movesFrom pieces (board));
+            ZobristHash=zobristAdder (board);
+            EvalFunc=fitness;
+            Value=0;
+            State= new Incrementor();
+            }
+        let (initval,initinc)= start newgame
+        do newgame.Value<-initval
+        do newgame.State<-initinc
+        newgame
+
     //TODO:Move this out
     //tests whether a game executes and completes
     let testGame (totest:Variation) : bool =

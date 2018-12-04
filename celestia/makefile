@@ -1,4 +1,4 @@
-fsc=fsharpc --nologo --warn:5 -I:binaries
+fsc=fsharpc --nologo --warn:5 -I:binaries -g
 optimize=--optimize+ --tailcalls+ --crossoptimize+
 debug=-g
 bin=binaries
