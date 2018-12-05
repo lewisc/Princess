@@ -1,5 +1,4 @@
-board_all : $(libs)/BoardConstants.dll \
-            $(libs)/MoveHelpers.dll \
+board_all : $(libs)/MoveHelpers.dll \
             $(libs)/MoveGen.dll \
             $(libs)/ValidMoves.dll \
             $(libs)/ZobristKeys.dll \
@@ -69,10 +68,3 @@ $(libs)/MoveHelpers.dll : $(libs)/Elements.dll \
                        -a \
                        --out:$(libs)/MoveHelpers.dll \
                        board/MoveHelpers.fs
-
-$(libs)/BoardConstants.dll : $(libs)/Elements.dll \
-                             board/BoardConstants.fs
-	$(fsc) $(optimize) -r:Elements.dll \
-                       -a \
-                       --out:$(libs)/BoardConstants.dll \
-                       board/BoardConstants.fs

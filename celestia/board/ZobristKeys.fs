@@ -9,7 +9,19 @@ open System.Collections.Generic
 
 module ZobristKeys =
 
-    let piecesOption = Array.append [|None|] (Array.map (fun x-> Some(x)) (allPieces ()))
+
+    let private piecesOption = [|Some(King(Black));
+                                 Some(Queen(Black));
+                                 Some(Knight(Black));
+                                 Some(Rook(Black));
+                                 Some(Pawn(Black));
+                                 Some(Bishop(Black)); 
+                                 Some(King(White));
+                                 Some(Queen(White));
+                                 Some(Knight(White));
+                                 Some(Rook(White));
+                                 Some(Pawn(White));
+                                 Some(Bishop(White));|]
 
     let pieceXPosition = Array.concat (Array.map (fun x -> (Array.map (fun y -> x,y ) allPositions)) piecesOption)
 

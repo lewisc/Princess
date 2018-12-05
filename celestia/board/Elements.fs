@@ -55,9 +55,6 @@ module Primitives =
                         | Bishop(Black) -> "b"
                         | Bishop(White) -> "B"
 
-    //type alias for the board as a sequence of sequences
-    type BoardSeq = Pieces option seq seq
-
     ///Board Type alias
     type Board = Pieces option [,]
 
@@ -71,11 +68,15 @@ module Primitives =
             val Advancement    :Score;
             val BlackPawnScore :Score;
             val WhitePawnScore :Score;
-            new(blackscore:Score, whitescore:Score, advancement:Score, blackpawnscore:Score, whitepawnscore:Score) = {BlackScore = blackscore;
-                                                                                                                     WhiteScore = whitescore;
-                                                                                                                     Advancement = advancement;
-                                                                                                                     BlackPawnScore = blackpawnscore;
-                                                                                                                     WhitePawnScore = whitepawnscore;}
+            new(blackscore:Score,
+                whitescore:Score,
+                advancement:Score,
+                blackpawnscore:Score,
+                whitepawnscore:Score) = {BlackScore = blackscore;
+                                         WhiteScore = whitescore;
+                                         Advancement = advancement;
+                                         BlackPawnScore = blackpawnscore;
+                                         WhitePawnScore = whitepawnscore;}
         end
                 
 
@@ -122,3 +123,35 @@ module Primitives =
             mutable OldPrevMove1:Pieces option * Position;
             mutable OldPrevMove2:Pieces option * Position;
             }
+
+    ///0-Indexed Lenght of Board
+    [<Literal>]
+    let maxXVal = 5
+
+    ///0-Indexed width of Board
+    [<Literal>]
+    let maxYVal = 4
+
+    ///Length of Board
+    [<Literal>]
+    let boardWidth = 5
+
+    ///Width of Board
+    [<Literal>]
+    let boardLength = 6
+
+
+    ///array of all the different board positions
+    let allPositions = [|for i in 0..maxXVal do 
+                            for j in 0..maxYVal-> (i,j)|]
+
+
+    ///represents a default board
+    let defaultBoard () = 
+     array2D [|[|Some(King(White)); Some(Queen(White)); Some(Bishop(White)); Some(Knight(White));Some(Rook(White))|];
+               [|Some(Pawn(White)); Some(Pawn(White));  Some(Pawn(White));   Some(Pawn(White));  Some(Pawn(White))|];
+               [|None ;             None ;              None;                None;               None             |];
+               [|None ;             None ;              None;                None;               None             |];
+               [|Some(Pawn(Black)); Some(Pawn(Black));  Some(Pawn(Black));   Some(Pawn(Black));  Some(Pawn(Black))|];
+               [|Some(Rook(Black)); Some(Knight(Black));Some(Bishop(Black)); Some(Queen(Black)); Some(King(Black))|];|]
+

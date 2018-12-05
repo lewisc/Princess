@@ -57,6 +57,13 @@ module EndGameDB =
                 for (j,k,l,m) in positions4 do
                    yield  ((j,i.[0]),(k,i.[1]),(l,i.[2]),(m,i.[3]))}
 
+    let comparison game1 game2 =
+        game1.Turn = game2.Turn &&
+        game1.BoardState = game2.BoardState
+
+    //keep iterating until you hit fixpointgg
+//    let rec fixCounter
+
     [<EntryPoint>]
     let main args =
 
