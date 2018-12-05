@@ -8,7 +8,6 @@ open AlphaBeta2
 open BoardHelpers
 open Primitives
 open BoardCombinators
-open BoardConstants
 open Heuristics
 
 open System

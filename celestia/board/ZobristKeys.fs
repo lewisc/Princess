@@ -1,7 +1,6 @@
 ﻿//(C) Lewis Coates
 namespace Celestia
 
-open BoardConstants
 open Primitives
 
 open System

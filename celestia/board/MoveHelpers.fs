@@ -5,7 +5,6 @@ open System
 open Primitives
 open TypedInput
 open ZobristKeys
-open BoardConstants
 
 ///Invalid move exception
 [<NoEquality;NoComparison>]

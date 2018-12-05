@@ -6,13 +6,13 @@ $(libs)/IMCSConnection.dll : connection/IMCSConnection.fs
                        --out:$(libs)/IMCSConnection.dll \
                        connection/IMCSConnection.fs
 
-$(libs)/ServerConnection.dll : $(libs)/Elements.dll \
+$(libs)/ServerConnection.dll : $(libs)/Primitives.dll \
                                $(libs)/MoveHelpers.dll \
                                $(libs)/IMCSConnection.dll \
                                $(libs)/ValidMoves.dll \
                                $(libs)/TypedInput.dll \
                                connection/ServerConnection.fs 
-	$(fsc) $(optimize) -r:Elements.dll \
+	$(fsc) $(optimize) -r:Primitives.dll \
                        -r:MoveHelpers.dll \
                        -r:IMCSConnection.dll \
                        -r:ValidMoves.dll \

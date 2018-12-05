@@ -5,7 +5,6 @@ open System
 open Primitives
 open TypedInput
 open ZobristKeys
-open BoardConstants
 open BoardHelpers
 open MoveCalculation
 
@@ -131,6 +130,11 @@ module BoardCombinators=
               ey=endy)) ((input.AvailableMoves.Force()))) = false
         then raise <| InvalidMove(((startx,starty),(endx,endy)),input)
         else fst (doUpdate input ((startx,starty), (endx,endy)))
+    let defaultIncrementor = {BlackScore = 0;
+                              WhiteScore = 0;
+                              Advancement = 0;
+                              BlackPawnScore = 0;
+                              WhitePawnScore = 0}
 
     //TODO:Get rid of this
     //constructor for an initial state game
@@ -148,7 +152,7 @@ module BoardCombinators=
             ZobristHash=zobristAdder (defaultBoard ());
             EvalFunc=fitness;
             Value=0;
-            State= new Incrementor();
+            State= defaultIncrementor;
             }
         let (initval,initinc)= start newgame
         do newgame.Value<-initval
@@ -169,7 +173,7 @@ module BoardCombinators=
             ZobristHash=zobristAdder (board);
             EvalFunc=fitness;
             Value=0;
-            State= new Incrementor();
+            State= defaultIncrementor;
             }
         let (initval,initinc)= start newgame
         do newgame.Value<-initval
@@ -183,7 +187,7 @@ module BoardCombinators=
                     let complete = 
                          List.fold (fun (board:GameState) (play) -> 
                              checkedUpdate board play) (initialState (fun  _ _-> 
-                                        (0,(new Incrementor()))) (fun _ -> (0,(new Incrementor())))) (totest)
+                                        (0,(defaultIncrementor))) (fun _ -> (0,(defaultIncrementor)))) (totest)
 
         //            do printfn "%s" (sprintBoard complete )
                     isTerminal complete
@@ -198,7 +202,7 @@ module BoardCombinators=
     let perfTest (totest:Variation) : bool =
                     let complete = List.fold  (fun (board:GameState) play -> 
                                     fst(doUpdate board play)) (initialState (fun _ _-> 
-                                            (0,(new Incrementor()))) (fun _ -> (0,(new Incrementor())))) totest 
+                                            (0,(defaultIncrementor))) (fun _ -> (0,(defaultIncrementor)))) totest 
                     isTerminal complete
     
     //trys to play the action on the board, if it fails it returns

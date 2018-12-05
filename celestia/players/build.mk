@@ -2,12 +2,12 @@ players_all : $(libs)/RandomPlayer.exe \
               $(libs)/NetworkPlayer.exe
 
 $(libs)/RandomPlayer.exe : $(libs)/MoveHelpers.dll \
-                           $(libs)/Elements.dll \
+                           $(libs)/Primitives.dll \
                            $(libs)/ValidMoves.dll \
                            $(libs)/Heuristics.dll \
                            players/RandomPlayer.fs
 	$(fsc) $(optimize) -r:MoveHelpers.dll \
-                       -r:Elements.dll \
+                       -r:Primitives.dll \
                        -r:ValidMoves.dll \
                        -r:Heuristics.dll\
                        --standalone \
@@ -15,7 +15,7 @@ $(libs)/RandomPlayer.exe : $(libs)/MoveHelpers.dll \
                        players/RandomPlayer.fs
 
 $(libs)/NetworkPlayer.exe : $(libs)/IMCSConnection.dll \
-                            $(libs)/Elements.dll \
+                            $(libs)/Primitives.dll \
                             $(libs)/ValidMoves.dll \
                             $(libs)/AlphaBeta.dll \
                             $(libs)/DepthFirstSearch.dll \
@@ -26,7 +26,7 @@ $(libs)/NetworkPlayer.exe : $(libs)/IMCSConnection.dll \
                             $(libs)/ServerConnection.dll \
                             players/NetPlayer.fs
 	$(fsc) $(optimize) -r:IMCSConnection.dll \
-                       -r:Elements.dll \
+                       -r:Primitives.dll \
                        -r:ValidMoves.dll \
                        -r:AlphaBeta.dll \
                        -r:DepthFirstSearch.dll \

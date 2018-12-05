@@ -10,20 +10,19 @@ $(libs)/MTDF.dll : $(libs)/AlphaBeta.dll \
                    search/MTDF.fs
 	$(fsc) $(optimize) -r:MoveHelpers.dll \
                        -r:AlphaBeta.dll \
-                       -r:Elements.dll \
+                       -r:Primitives.dll \
                        -r:ValidMoves.dll \
-                       -r:BoardConstants.dll \
                        -r:TranspositionTable.dll \
                        -r:DepthFirstSearch.dll \
                        -a \
                        --out:$(libs)/MTDF.dll \
                        search/MTDF.fs
 
-$(libs)/Heuristics.dll : $(libs)/Elements.dll \
+$(libs)/Heuristics.dll : $(libs)/Primitives.dll \
                          $(libs)/ValidMoves.dll \
                          $(libs)/MoveHelpers.dll \
                          search/Heuristics.fs
-	$(fsc) $(optimize) -r:Elements.dll \
+	$(fsc) $(optimize) -r:Primitives.dll \
                        -r:ValidMoves.dll \
                        -r:MoveHelpers.dll \
                        -a \
@@ -31,11 +30,11 @@ $(libs)/Heuristics.dll : $(libs)/Elements.dll \
                        search/Heuristics.fs
 
 $(libs)/Quiescence.dll : $(libs)/MoveHelpers.dll \
-                         $(libs)/Elements.dll \
+                         $(libs)/Primitives.dll \
                          $(libs)/ValidMoves.dll \
                          search/Quiescence.fs
 	$(fsc) $(optimize) -r:MoveHelpers.dll \
-                       -r:Elements.dll \
+                       -r:Primitives.dll \
                        -r:ValidMoves.dll \
                        -a \
                        --out:$(libs)/Quiescence.dll \
@@ -43,14 +42,14 @@ $(libs)/Quiescence.dll : $(libs)/MoveHelpers.dll \
 
 $(libs)/AlphaBeta.dll : $(libs)/MoveHelpers.dll \
                         $(libs)/DepthFirstSearch.dll \
-                        $(libs)/Elements.dll \
+                        $(libs)/Primitives.dll \
                         $(libs)/Quiescence.dll \
                         $(libs)/ValidMoves.dll \
                         $(libs)/TranspositionTable.dll \
                         search/AlphaBeta2.fs
 	$(fsc) $(optimize) -r:MoveHelpers.dll \
                        -r:DepthFirstSearch.dll \
-                       -r:Elements.dll \
+                       -r:Primitives.dll \
                        -r:Quiescence.dll \
                        -r:ValidMoves.dll \
                        -r:TranspositionTable.dll \
@@ -60,7 +59,7 @@ $(libs)/AlphaBeta.dll : $(libs)/MoveHelpers.dll \
 
 $(libs)/AlphaBetaID.dll : $(libs)/MoveHelpers.dll \
                           $(libs)/DepthFirstSearch.dll \
-                          $(libs)/Elements.dll \
+                          $(libs)/Primitives.dll \
                           $(libs)/Quiescence.dll \
                           $(libs)/ValidMoves.dll \
                           $(libs)/AlphaBeta.dll \
@@ -68,7 +67,7 @@ $(libs)/AlphaBetaID.dll : $(libs)/MoveHelpers.dll \
                           search/AlphaBetaID.fs
 	$(fsc) $(optimize) -r:MoveHelpers.dll \
                        -r:DepthFirstSearch.dll \
-                       -r:Elements.dll \
+                       -r:Primitives.dll \
                        -r:Quiescence.dll \
                        -r:ValidMoves.dll \
                        -r:AlphaBeta.dll \
@@ -77,11 +76,11 @@ $(libs)/AlphaBetaID.dll : $(libs)/MoveHelpers.dll \
                         --out:$(libs)/AlphaBetaID.dll \
                        search/AlphaBetaID.fs
 
-$(libs)/DepthFirstSearch.dll : $(libs)/Elements.dll \
+$(libs)/DepthFirstSearch.dll : $(libs)/Primitives.dll \
                                $(libs)/ValidMoves.dll \
                                $(libs)/MoveHelpers.dll \
                                search/DepthFirstSearch.fs
-	$(fsc) $(optimize) -r:Elements.dll \
+	$(fsc) $(optimize) -r:Primitives.dll \
                        -r:ValidMoves.dll \
                        -r:MoveHelpers.dll \
                        -a \
