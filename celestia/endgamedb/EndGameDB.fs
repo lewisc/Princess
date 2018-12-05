@@ -63,10 +63,10 @@ module EndGameDB =
         let boards2 = (List.map (fun i -> setState SimpleCount initialSimple (buildBoard i) White) states2) @ (List.map (fun i -> setState SimpleCount initialSimple (buildBoard i) Black) states2)
         let boards3 = (List.map (fun i -> setState SimpleCount initialSimple (buildBoard i) White) states3) @ (List.map (fun i -> setState SimpleCount initialSimple (buildBoard i) Black) states3)
         let knownKills = (List.filter (fun i -> 
-            let value = (AlphaBetaSearch i 5)
+            let value = (AlphaBetaSearch i 2)
             //printfn "%s" (sprintBoard i)
             //printfn "%s" (value.ToString())
-            abs(snd(value)) = inf) (boards2))
+            abs(snd(value)) > inf) (boards2))
 
         List.map (fun i -> printfn "%s" (sprintBoard i)) knownKills |> ignore
 
