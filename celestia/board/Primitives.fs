@@ -81,12 +81,12 @@ module Primitives =
 
     ///represents a default board
     let DefaultBoard () = 
-     array2D [|[|Some(King(White)); Some(Queen(White)); Some(Bishop(White)); Some(Knight(White));Some(Rook(White))|];
-               [|Some(Pawn(White)); Some(Pawn(White));  Some(Pawn(White));   Some(Pawn(White));  Some(Pawn(White))|];
-               [|None ;             None ;              None;                None;               None             |];
-               [|None ;             None ;              None;                None;               None             |];
-               [|Some(Pawn(Black)); Some(Pawn(Black));  Some(Pawn(Black));   Some(Pawn(Black));  Some(Pawn(Black))|];
-               [|Some(Rook(Black)); Some(Knight(Black));Some(Bishop(Black)); Some(Queen(Black)); Some(King(Black))|];|]
+     array2D [| [| Some(King(White)); Some(Queen(White)); Some(Bishop(White)); Some(Knight(White));Some(Rook(White)) |]
+                [| Some(Pawn(White)); Some(Pawn(White));  Some(Pawn(White));   Some(Pawn(White));  Some(Pawn(White)) |]
+                [| None ;             None ;              None;                None;               None              |]
+                [| None ;             None ;              None;                None;               None              |]
+                [| Some(Pawn(Black)); Some(Pawn(Black));  Some(Pawn(Black));   Some(Pawn(Black));  Some(Pawn(Black)) |]
+                [| Some(Rook(Black)); Some(Knight(Black));Some(Bishop(Black)); Some(Queen(Black)); Some(King(Black)) |] |]
 
 
     ///Incremental evaluation state
@@ -104,25 +104,27 @@ module Primitives =
                          Taken: Pieces option;
                          Move: Ply; }
 
-    ///the type that incrementally evaluates the gamestate
-    type Evaluator = StateUpdate -> GameState -> Score * Incrementor
 
     ///State of a game
     ///This is mutable to be able to use a do/undo style semantics for
     ///performance
     [<NoEquality; NoComparison>]
-    type GameState = { EvalFunc: Evaluator
-                       TimeOut: int;
-                       BoardState: Pieces option [,];
-                       mutable Turn: Color;
-                       mutable IsPlaying: bool;
-                       mutable AvailableMoves: Ply [] Lazy;
-                       mutable Index: int;
-                       mutable WhitePieces: (Pieces * Position) list;
-                       mutable BlackPieces: (Pieces * Position) list;
-                       mutable ZobristHash: int64;
-                       mutable State: Incrementor;
-                       mutable Value: Score; }
+    type GameState =
+            { EvalFunc: StateUpdate -> GameState -> Score * Incrementor
+              TimeOut: int;
+              BoardState: Pieces option [,];
+              mutable Turn: Color;
+              mutable IsPlaying: bool;
+              mutable AvailableMoves: Ply [] Lazy;
+              mutable Index: int;
+              mutable WhitePieces: (Pieces * Position) list;
+              mutable BlackPieces: (Pieces * Position) list;
+              mutable ZobristHash: int64;
+              mutable State: Incrementor;
+              mutable Value: Score; }
+
+    ///the type that incrementally evaluates the gamestate
+    type Evaluator = StateUpdate -> GameState -> Score * Incrementor
 
     ///An undo struct that should have every necessary to unwork a move
     [<NoEquality; NoComparison>]
