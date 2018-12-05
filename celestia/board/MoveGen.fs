@@ -30,7 +30,7 @@ module MoveCalculation =
     //returns the possibilities for a move(capture, invalid, normal).
     //Normal moves can be continued, invalid/captures can't
     let inline private testValidMove (x:int) (y:int) (board:Pieces option[,]) (hue:Color)  : MoveType =
-                if (x > maxXVal  || x < 0  || y > maxYVal  || y < 0)
+                if (x > MaxXVal  || x < 0  || y > MaxYVal  || y < 0)
                 //if the move is off the board
                 then Invalid
                 else match (board.[x,y]) with

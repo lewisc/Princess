@@ -4,7 +4,6 @@ open Primitives
 open tester
 open BoardCombinators
 open Heuristics
-open BoardCombinators
 open DepthFirstSearch
 open System.Diagnostics
 open DFSRegression
@@ -14,7 +13,6 @@ open Heuristics
 open AlphaBeta2
 open ZobristKeys
 open MTDF
-open BoardConstants
 open System.IO
 open TranspositionTable
 
@@ -52,8 +50,6 @@ module RegressionRunner =
 
         printfn "%d" !counter
         counter := 0
-    *)
-    let COMBINATIONSTEST () = 
         let piece0 = pieceCombinations 0 |> Set.toList  |> List.sort 
         let piece1 = pieceCombinations 1 |> Set.toList  |> List.sort 
         let piece2 = pieceCombinations 2 |> Set.toList  |> List.sort
@@ -76,6 +72,8 @@ module RegressionRunner =
         do write  s2
         do write  s3
         do write  s4
+    *)
+
     (*
     let TESTGAME = 
         let rand = Random();

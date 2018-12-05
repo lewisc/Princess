@@ -130,26 +130,27 @@ module BoardCombinators=
               ey=endy)) ((input.AvailableMoves.Force()))) = false
         then raise <| InvalidMove(((startx,starty),(endx,endy)),input)
         else fst (doUpdate input ((startx,starty), (endx,endy)))
-    let defaultIncrementor = {BlackScore = 0;
-                              WhiteScore = 0;
-                              Advancement = 0;
-                              BlackPawnScore = 0;
-                              WhitePawnScore = 0}
+
+    let defaultIncrementor = { BlackScore = 0;
+                               WhiteScore = 0;
+                               Advancement = 0;
+                               BlackPawnScore = 0;
+                               WhitePawnScore = 0 }
 
     //TODO:Get rid of this
     //constructor for an initial state game
     let initialState fitness start = 
-        let pieces =  piecesOfGame (defaultBoard ()) White 
+        let pieces =  piecesOfGame (DefaultBoard ()) White 
         let newgame = 
            {Turn=White;
-            BoardState=(defaultBoard ());
+            BoardState=(DefaultBoard ());
             TimeOut=81;
             IsPlaying=true;
             Index=1;
-            BlackPieces=(piecesOfGame (defaultBoard ()) Black);
+            BlackPieces=(piecesOfGame (DefaultBoard ()) Black);
             WhitePieces=pieces;
-            AvailableMoves=lazy(movesFrom pieces (defaultBoard ()));
-            ZobristHash=zobristAdder (defaultBoard ());
+            AvailableMoves=lazy(movesFrom pieces (DefaultBoard ()));
+            ZobristHash=zobristAdder (DefaultBoard ());
             EvalFunc=fitness;
             Value=0;
             State= defaultIncrementor;

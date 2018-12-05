@@ -15,7 +15,49 @@ open System.Collections.Generic
 open System.IO
 
 module EndGameDB =
+///array of all the different white pieces, with appropriate repeats
+    let whitePiecesStart () =
+        [|King(White); 
+         Queen(White);
+         Knight(White);
+         Rook(White);
+         Bishop(White);
+         Pawn(White);
+         Pawn(White);
+         Pawn(White);
+         Pawn(White);
+         Pawn(White);|]
+    ///array of all the different black pieces, with appropriate repeats
+    let blackPiecesStart () = 
+        [|King(Black); 
+         Queen(Black);
+         Knight(Black);
+         Rook(Black);
+         Bishop(Black);
+         Pawn(Black);
+         Pawn(Black);
+         Pawn(Black);
+         Pawn(Black);
+         Pawn(Black);|]
+    ///array of all the different pieces, with appropriate repeats
+    let allPiecesStart () = Array.append (whitePiecesStart ()) (blackPiecesStart ())
 
+  ///This is used for the endgame DB
+    ///Not complete
+    let pieceCombinations n =
+        let ret = [King(Black);King(White)]
+        let remainingPieces = List.choose (fun x -> match x with
+                                                     | King(_) -> None
+                                                     | x -> Some(x)) (Array.toList (allPiecesStart ()))
+        let rec searcher d (set:Pieces list Set) currlist listremaining =
+                match d with
+                | 0 -> set.Add(currlist)
+                | _ -> match listremaining with
+                       | head::tail ->let newres = searcher (d-1) set (head::currlist) tail
+                                      searcher d newres currlist tail
+                       | [] -> set
+
+        searcher n Set.empty ret remainingPieces
     let positions = [ for i in 0 .. 4 do for j in 0 ..5  -> (i, j)]
 
     let positions2 = 

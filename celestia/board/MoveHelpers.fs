@@ -35,7 +35,7 @@ module BoardHelpers =
     let piecesOfGame (board:Board) (color:Color) : (Pieces * Position) list =
         Array.fold (fun acc (x,y) -> match board.[x,y] with 
                                      | Some(p) when pieceColor p = color -> (p,(x,y))::acc
-                                     | _ -> acc) [] allPositions
+                                     | _ -> acc) [] AllPositions
 
     //takes in a 2 dimensional array and turns it into a seq<seq<'a>>
     let arrayAsSeq (input: 'a [,]) =

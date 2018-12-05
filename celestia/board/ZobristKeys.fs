@@ -22,7 +22,7 @@ module ZobristKeys =
                                  Some(Pawn(White));
                                  Some(Bishop(White));|]
 
-    let pieceXPosition = Array.concat (Array.map (fun x -> (Array.map (fun y -> x,y ) allPositions)) piecesOption)
+    let pieceXPosition = Array.concat (Array.map (fun x -> (Array.map (fun y -> x,y ) AllPositions)) piecesOption)
 
     let rand = Random()
 
@@ -49,5 +49,5 @@ module ZobristKeys =
                      todictionary
 
     let zobristAdder (input:Pieces option [,]) =
-        let ret = Array.fold (fun x (z1,z2) -> x^^^(zobristMap.[input.[z1,z2],(z1,z2)])) 0L allPositions
+        let ret = Array.fold (fun x (z1,z2) -> x^^^(zobristMap.[input.[z1,z2],(z1,z2)])) 0L AllPositions
         ret
