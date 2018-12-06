@@ -3,7 +3,7 @@ open System
 open System.IO
 
 open Primitives
-open BoardCombinators
+open GameState
 open TypedInput
 
               
@@ -183,7 +183,7 @@ module Actions =
 
     let playGame (connection:IMCSConnection) (payload:Player) (initialcolor) =
         //initialize the gamestate
-        let initgame = initialState payload.EvalFun payload.EvalInit 
+        let gamestate = new GameState(payload.EvalFun payload.EvalInit)
         
         //search for 8 seconds
         //TODO:make this dynamic
@@ -192,7 +192,7 @@ module Actions =
         let searchponder = payload.SearchPonder (fun () -> connection.NetStream.DataAvailable)
 
         //mainloop, play the game
-        let rec play (gamestate:GameState) (color:Color) =
+        let rec play (color:Color) =
 
             //end condition 1, should never be hit, but doesn't cause any problems
             if gamestate.IsTerminal()
@@ -205,13 +205,13 @@ module Actions =
                  //the opponents color(which should switch to pondering)
                  | x when x = initialcolor-> 
                                    let (newmove,x) = searchprime gamestate
-                                   let (newgame,_) = doUpdate gamestate newmove
+                                   let (newgame,_) = gamestate.doUpdate(newmove)
                                    do printfn "Move %s, score %d" (sprintMove newmove) x
                                    do printfn "%s" (newgame.ToString())
                                    if newmove <> ((-1,-1),(-1,-1)) then 
                                        do playMove connection newmove
                                    else do playMove connection (gamestate.AvailableMoves.Force().[0])
-                                   play newgame (color.Not())
+                                   play (color.Not())
                  //get the result from pondering, we don't do anything with it, but
                  //future diagnostics may
                  //get the response fromt he server, play it internally
@@ -219,17 +219,17 @@ module Actions =
                         let response = readToGameStop connection
                         match response with
                         | Inplay(t) -> match t with
-                                       | Some(move) -> let (newgame,_) = doUpdate gamestate move
-                                                       play newgame (color.Not())
+                                       | Some(move) -> let (newgame,_) = gamestate.doUpdate(move)
+                                                       play (color.Not())
                                     //this indicates that a parse error occurred, but technically
                                     //we might be able to muscle past
                                        | None ->  printfn "Didn't read a move when should have"
-                                                  play gamestate (color)
+                                                  play (color)
                         //or exit out, this is the endcase that should always occur
                         | End(t) -> 1000000, t
         //first move is by white, if that's me then search activates, if that's not me then ponder
         //activates
-        play initgame White
+        play White
 
                         
             

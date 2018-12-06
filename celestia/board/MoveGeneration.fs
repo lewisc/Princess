@@ -1,16 +1,13 @@
 ﻿//Lewis Coates (c) April 7, 2011                                                
 namespace Celestia
+
+
 open System
 
 open Primitives
-open TypedInput
-open ZobristKeys
+open ZobristHash
 
-module MoveCalculation =
-    //Everything except for the end main move generator is private for information leakage, operations should be performed
-    //on lists of moves/arrays of moves, not exposing the internals of the move calculation
-
-    //capture might be useful to expose, but probably not
+module MoveGeneration =
 
     //the different things that can happen with a move.
     //invalid represents a move such as trying to capture your own piece
@@ -27,11 +24,14 @@ module MoveCalculation =
 
     //returns the possibilities for a move(capture, invalid, normal).
     //Normal moves can be continued, invalid/captures can't
-    let inline private testValidMove (x:int) (y:int) (board:Pieces option[,]) (hue:Color)  : MoveType =
-                if (x > MaxXVal  || x < 0  || y > MaxYVal  || y < 0)
+    let inline private testValidMove (x : int) (y : int) (board : Board)
+                                                    (hue : Color) : MoveType =
+                if (x > MaxXVal || x < 0 || y > MaxYVal || y < 0)
                 //if the move is off the board
-                then Invalid
-                else match (board.[x,y]) with
+                then
+                    Invalid
+                else 
+                    match (board.[x, y]) with
                      //the case where the desitnation is empty
                      | (None) -> Normal
                      | (Some(z)) -> match (z.Color, hue) with 
@@ -39,45 +39,57 @@ module MoveCalculation =
                                        | (Black, Black) 
                                        | (White, White) -> Invalid
                                        | (Black, White) 
-                                       | (White, Black) -> Capture(z,(x,y))
+                                       | (White, Black) -> Capture(z, (x, y))
 
     //helper function that returns a list of 
     //possible moves along a dx/dy move allowance.
     //this is the main engine
-    let inline private scanMovesGame ((x:int),(y:int)) (board:Board) (hue:Color) (attacktype:PieceCaptures) (endcount:int) (retval:Ply []) (dx:int) (dy:int)  (index:int) : (Ply []) * int =
+    let inline private scanMovesGame ((x, y) : Position) (board:Board)
+                            (hue : Color) (attacktype : PieceCaptures)
+                            (endcount : int) (retval : Ply [])
+                            (dx : int) (dy : int) (index : int)
+                                                        : (Ply []) * int =
                 //march through the possibiliti
                 let rec scanloop xnew ynew count index = 
                     let newx = xnew+dx
                     let newy = ynew+dy
-                    if endcount < count  then (retval, (index)) else
+                    if endcount < count  then (retval, index) else
                     //march through the possibilities
                     match (testValidMove newx newy board hue) with
-                    | Invalid -> (retval, (index))
+                    | Invalid -> (retval, index)
                     | Normal  -> match attacktype with
-                                 | Take -> scanloop newx newy (count+1) index
+                                 | Take -> scanloop newx newy (count + 1) index
                                  | Both | Free ->  
                                      let newIndex = index+1
-                                     do retval.[newIndex] <- ((x,y),(newx,newy))
-                                     scanloop newx newy (count+1) newIndex
+                                     do retval.[newIndex] <- ((x, y),
+                                                              (newx, newy))
+                                     scanloop newx newy (count + 1 ) newIndex
                     | Capture(_) -> 
                                 match attacktype with
                                 | Free -> (retval, index)
-                                | Both | Take -> let newIndex = index+1
-                                                 do retval.[newIndex] <- ((x,y),(newx,newy))
+                                | Both | Take -> let newIndex = index + 1
+                                                 do retval.[newIndex] <- 
+                                                     ((x, y), (newx, newy))
                                                  (retval, newIndex)
                 scanloop x y 1 index 
       
     //gets a list of all valid moves from a 
     //piece at a given coordinate(can be a hypothetical piece)
-    let inline private validMoves (piece:Pieces) (pos:Position) (board) (availableMoves:Ply[])  (index:int) : (Ply[]) * int =
+    let inline private validMoves (piece : Pieces) (pos : Position)
+                                  (board : Board) (availableMoves : Ply [])
+                                  (index : int) : (Ply []) * int =
 
         //scanner 1 scans 1 move ahead
         //scanner A scans as far as possible ahead
-        let scanner1 = scanMovesGame pos board (piece.Color) Both 1 availableMoves
+        let scanner1 = scanMovesGame pos board (piece.Color)
+                                     Both 1 availableMoves
 
-        let scannerA = scanMovesGame pos board (piece.Color) Both  (11) availableMoves
-        let withcap1 = scanMovesGame pos board (piece.Color) Take 1 availableMoves
-        let nocap1   = scanMovesGame pos board (piece.Color) Free 1 availableMoves
+        let scannerA = scanMovesGame pos board (piece.Color)
+                                     Both  (11) availableMoves
+        let withcap1 = scanMovesGame pos board (piece.Color)
+                                     Take 1 availableMoves
+        let nocap1   = scanMovesGame pos board (piece.Color)
+                                     Free 1 availableMoves
     
         //generally the different directions of the scans 
         //are catted together
@@ -128,14 +140,15 @@ module MoveCalculation =
                          |> withcap1 (sign) (-1) |> snd
                          |> withcap1 (sign) (1) 
     
-        | Rook(color) ->  scannerA  1  0 index  |> snd
-                          |> scannerA  0  1     |> snd
-                          |> scannerA -1  0     |> snd
-                          |> scannerA  0 -1    
+        | Rook(color) -> scannerA  1  0 index |> snd
+                         |> scannerA  0  1    |> snd
+                         |> scannerA -1  0    |> snd
+                         |> scannerA  0 -1   
 
     //gets the available moves of a piece at a position on a 
     //given gameboard
-    let movesFrom (input:(Pieces * Position) List) (board) : (Ply []) = 
+    let movesFrom (input : PieceLoc List) (board) : (Ply []) = 
           //get all of the available moves
-          let (retval,endIndex) = List.fold (fun (availableMoves, index)  (piece,pos) -> validMoves piece pos board availableMoves index) ((Array.create 600 ((0,0),(0,0))), (-1)) input 
+          let (retval,endIndex) = List.fold (fun (availableMoves, index) (piece,pos) -> validMoves piece pos board availableMoves index) ((Array.create 600 ((0,0),(0,0))), (-1)) input 
+
           retval.[0..endIndex]

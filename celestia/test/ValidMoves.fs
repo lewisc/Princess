@@ -10,56 +10,6 @@ open MoveCalculation
 
 module BoardCombinators =
 
-    let defaultIncrementor = { BlackScore = 0;
-                               WhiteScore = 0;
-                               Advancement = 0;
-                               BlackPawnScore = 0;
-                               WhitePawnScore = 0 }
-
-    //TODO:Get rid of this
-    //constructor for an initial state game
-    let initialState fitness start = 
-        let pieces = piecesOfGame (DefaultBoard ()) White
-        let newgame = 
-           {Turn=White;
-            BoardState=(DefaultBoard ());
-            TimeOut=81;
-            IsPlaying=true;
-            Index=1;
-            BlackPieces = piecesOfGame (DefaultBoard ()) Black;
-            WhitePieces=pieces;
-            AvailableMoves=lazy(movesFrom pieces (DefaultBoard ()));
-            ZobristHash=zobristAdder (DefaultBoard ());
-            EvalFunc=fitness;
-            Value=0;
-            State= defaultIncrementor;
-            }
-        let (initval,initinc)= start newgame
-        do newgame.Value<-initval
-        do newgame.State<-initinc
-        newgame
-
-    let setState fitness start board color = 
-        let pieces = piecesOfGame board color
-        let newgame = 
-           {Turn=color;
-            BoardState=board;
-            TimeOut=81;
-            IsPlaying=true;
-            Index=1;
-            BlackPieces = piecesOfGame board Black;
-            WhitePieces= piecesOfGame board White;
-            AvailableMoves=lazy(movesFrom pieces board);
-            ZobristHash=zobristAdder board;
-            EvalFunc=fitness;
-            Value=0;
-            State= defaultIncrementor;
-            }
-        let (initval,initinc)= start newgame
-        do newgame.Value<-initval
-        do newgame.State<-initinc
-        newgame
-    //
     //updates the array of options. Note this is immutable so a copy is 
     //made this makes this function quite expensive
     let checkedUpdate input ((startx,starty), (endx,endy))  : GameState =  
