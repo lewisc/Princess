@@ -1,6 +1,6 @@
 ﻿namespace Celestia
+
 open BoardCombinators
-open BoardHelpers
 open Primitives
 
 module Heuristics =
@@ -36,19 +36,17 @@ module Heuristics =
         let old = input.OldPiece
         let newpiece = input.NewPiece
         let taken = input.Taken
-        assert(pieceColor old = pieceColor newpiece)
+        assert(old.Color = newpiece.Color)
         let (blackscore,whitescore) = 
-            match pieceColor newpiece with
+            match newpiece.Color with
             | Black -> match taken with
                        | None -> (game.State.BlackScore - (pieceValue old) + (pieceValue newpiece), game.State.WhiteScore)
-                       | Some(y) ->
-                                assert(pieceColor y <> pieceColor old)
-                                (game.State.BlackScore -  (pieceValue old) + (pieceValue newpiece), game.State.WhiteScore - (pieceValue y))
+                       | Some(y) -> assert(y.Color <> old.Color)
+                                    (game.State.BlackScore -  (pieceValue old) + (pieceValue newpiece), game.State.WhiteScore - (pieceValue y))
             | White -> match taken with 
                        | None -> (game.State.BlackScore, game.State.WhiteScore - (pieceValue old) + (pieceValue newpiece))
-                       | Some(y) ->
-                                assert(pieceColor y <> pieceColor old)
-                                (game.State.BlackScore-(pieceValue y), game.State.WhiteScore - (pieceValue old) + (pieceValue newpiece))
+                       | Some(y) -> assert(y.Color <> old.Color)
+                                    (game.State.BlackScore-(pieceValue y), game.State.WhiteScore - (pieceValue old) + (pieceValue newpiece))
 
         let retval = (whitescore-blackscore)*(onPlay game.Turn)
         assert(retval = (fst (initialSimple game))*(onPlay game.Turn))
@@ -75,21 +73,19 @@ module Heuristics =
         let newpiece = input.NewPiece
         let taken = input.Taken
         let ((startx,starty),(endx,endy)) = input.Move
-        assert(pieceColor old = pieceColor newpiece)
+        assert(old.Color = newpiece.Color)
 
 
         let (blackscore,whitescore) = 
-            match pieceColor newpiece with
+            match newpiece.Color with
             | Black -> match taken with
                        | None -> (game.State.BlackScore - (pieceValue old) + (pieceValue newpiece), game.State.WhiteScore)
-                       | Some(y) ->
-                                assert(pieceColor y <> pieceColor old)
-                                (game.State.BlackScore -  (pieceValue old) + (pieceValue newpiece), game.State.WhiteScore - (pieceValue y))
+                       | Some(y) -> assert(y.Color <> old.Color)
+                                    (game.State.BlackScore -  (pieceValue old) + (pieceValue newpiece), game.State.WhiteScore - (pieceValue y))
             | White -> match taken with 
                        | None -> (game.State.BlackScore, game.State.WhiteScore - (pieceValue old) + (pieceValue newpiece))
-                       | Some(y) ->
-                                assert(pieceColor y <> pieceColor old)
-                                (game.State.BlackScore-(pieceValue y), game.State.WhiteScore - (pieceValue old) + (pieceValue newpiece))
+                       | Some(y) -> assert(y.Color <> old.Color)
+                                    (game.State.BlackScore-(pieceValue y), game.State.WhiteScore - (pieceValue old) + (pieceValue newpiece))
         let pawncapture =
             match taken with
             | Some(Pawn(color)) -> match color with

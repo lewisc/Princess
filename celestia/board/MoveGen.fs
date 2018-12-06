@@ -5,8 +5,6 @@ open System
 open Primitives
 open TypedInput
 open ZobristKeys
-open BoardHelpers
-
 
 module MoveCalculation =
     //Everything except for the end main move generator is private for information leakage, operations should be performed
@@ -36,7 +34,7 @@ module MoveCalculation =
                 else match (board.[x,y]) with
                      //the case where the desitnation is empty
                      | (None) -> Normal
-                     | (Some(z)) -> match (pieceColor z,hue) with 
+                     | (Some(z)) -> match (z.Color, hue) with 
                                         //can't capture own piece
                                        | (Black, Black) 
                                        | (White, White) -> Invalid
@@ -75,11 +73,11 @@ module MoveCalculation =
 
         //scanner 1 scans 1 move ahead
         //scanner A scans as far as possible ahead
-        let scanner1 = scanMovesGame pos board (pieceColor piece) Both 1 availableMoves
+        let scanner1 = scanMovesGame pos board (piece.Color) Both 1 availableMoves
 
-        let scannerA = scanMovesGame pos board (pieceColor piece) Both  (11) availableMoves
-        let withcap1 = scanMovesGame pos board (pieceColor piece) Take 1 availableMoves
-        let nocap1   = scanMovesGame pos board (pieceColor piece) Free 1 availableMoves
+        let scannerA = scanMovesGame pos board (piece.Color) Both  (11) availableMoves
+        let withcap1 = scanMovesGame pos board (piece.Color) Take 1 availableMoves
+        let nocap1   = scanMovesGame pos board (piece.Color) Free 1 availableMoves
     
         //generally the different directions of the scans 
         //are catted together

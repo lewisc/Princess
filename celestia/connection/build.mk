@@ -7,13 +7,11 @@ $(libs)/IMCSConnection.dll : connection/IMCSConnection.fs
                        connection/IMCSConnection.fs
 
 $(libs)/ServerConnection.dll : $(libs)/Primitives.dll \
-                               $(libs)/MoveHelpers.dll \
                                $(libs)/IMCSConnection.dll \
                                $(libs)/ValidMoves.dll \
                                $(libs)/TypedInput.dll \
                                connection/ServerConnection.fs 
 	$(fsc) $(optimize) -r:Primitives.dll \
-                       -r:MoveHelpers.dll \
                        -r:IMCSConnection.dll \
                        -r:ValidMoves.dll \
                        -r:TypedInput.dll \

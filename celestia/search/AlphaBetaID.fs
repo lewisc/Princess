@@ -6,7 +6,6 @@ open BoardCombinators
 open TranspositionTable
 open Quiescence
 open AlphaBeta2
-open BoardHelpers
 open System.Diagnostics
 
 
@@ -22,7 +21,7 @@ module AlphaBetaID =
                              let (newnode,newundo) = doUpdate currentnode head
                              //negamax depth
                              let newtest = -(match (currentdepth-1) with 
-                                             | x when x <= 0 || isTerminal newnode-> newnode.Value
+                                             | x when x <= 0 || newnode.IsTerminal() -> newnode.Value
                                              | _ -> searcher -currentbeta -currentalpha newnode 0 (newnode.AvailableMoves.Force()) (currentdepth-1))
                              do undoUpdate currentnode newundo
                              //alpha prune
@@ -62,7 +61,7 @@ module AlphaBetaID =
                              let (newnode,newundo) = doUpdate currentnode head
                              //travel the depth
                              let newtest =  -(match currentdepth-1 with 
-                                              | x when x <= 0 || isTerminal newnode-> newnode.Value
+                                              | x when x <= 0 || newnode.IsTerminal() -> newnode.Value
                                               | _ ->  match (getTranspose newnode.ZobristHash (currentdepth-1) newnode.Turn) with
                                                       | Some(Transpose.Exact,x) -> x
                                                       | Some(Transpose.Upper,x) when x <= -currentbeta-> x
@@ -128,7 +127,7 @@ module AlphaBetaID =
                              let (newnode,newundo) = doUpdate currentnode head
                              //travel the depth
                              let newtest =  -(match currentdepth-1 with 
-                                              | x when x <= 0 || isTerminal newnode-> newnode.Value
+                                              | x when x <= 0 || newnode.IsTerminal() -> newnode.Value
                                               | _ ->  match (getTranspose newnode.ZobristHash (currentdepth-1) newnode.Turn) with
                                                       | Some(Transpose.Exact,x) -> x
                                                       | Some(Transpose.Upper,x) when x <= -currentbeta-> x

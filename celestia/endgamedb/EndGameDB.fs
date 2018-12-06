@@ -5,7 +5,6 @@ open System.Runtime.Serialization
 
 open MTDF
 open AlphaBeta2
-open BoardHelpers
 open Primitives
 open BoardCombinators
 open Heuristics
@@ -116,6 +115,6 @@ module EndGameDB =
             //printfn "%s" (value.ToString())
             abs(snd(value)) > inf) (boards2))
 
-        List.map (fun i -> printfn "%s" (sprintBoard i)) knownKills |> ignore
+        List.map (fun i -> printfn "%s" (i.ToString())) knownKills |> ignore
 
         0

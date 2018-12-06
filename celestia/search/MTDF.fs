@@ -5,7 +5,6 @@ open System.Diagnostics
 open Primitives
 open AlphaBeta2
 open DepthFirstSearch
-open BoardHelpers
 
 module MTDF =
 

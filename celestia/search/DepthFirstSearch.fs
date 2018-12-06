@@ -3,7 +3,6 @@
 open System.Diagnostics
 
 open BoardCombinators
-open BoardHelpers
 open Primitives
 
 
@@ -40,10 +39,10 @@ module DepthFirstSearch =
     let DepthFirstSearchFrame maxer (depth:int) (game:GameState) : (Ply * Score) =
         let myTurn = onPlay game
 
-        let rec searcher d game side =
+        let rec searcher d (game:GameState) side =
             match d with
             //terminal Node
-            | x when x = 0 || (isTerminal game) -> 
+            | x when x = 0 || (game.IsTerminal()) -> 
                                     let movescore = game.Value
                                     (botMove,(movescore * side))
             //the max of the child moves, each child move gets mapped to 
@@ -62,12 +61,12 @@ module DepthFirstSearch =
         let timer = Stopwatch.StartNew()
 
         // seacher, has a time check
-        let rec searcher depth game side : (Ply * Score) =
+        let rec searcher depth (game:GameState) side : (Ply * Score) =
             if timer.ElapsedMilliseconds >= time 
             then (botMove,-inf  ) else
 
             match depth with
-            | x when x = 0 || (isTerminal game) -> 
+            | x when x = 0 || (game.IsTerminal()) -> 
                             let movescore = game.Value
                             (botMove,(movescore * side))
             | _ -> maxer searcher depth game side

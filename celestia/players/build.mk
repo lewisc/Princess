@@ -1,13 +1,11 @@
 players_all : $(libs)/RandomPlayer.exe \
               $(libs)/NetworkPlayer.exe
 
-$(libs)/RandomPlayer.exe : $(libs)/MoveHelpers.dll \
-                           $(libs)/Primitives.dll \
+$(libs)/RandomPlayer.exe : $(libs)/Primitives.dll \
                            $(libs)/ValidMoves.dll \
                            $(libs)/Heuristics.dll \
                            players/RandomPlayer.fs
-	$(fsc) $(optimize) -r:MoveHelpers.dll \
-                       -r:Primitives.dll \
+	$(fsc) $(optimize) -r:Primitives.dll \
                        -r:ValidMoves.dll \
                        -r:Heuristics.dll\
                        --standalone \

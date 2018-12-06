@@ -8,7 +8,6 @@ open System.IO
 open BoardCombinators
 open Primitives
 open Heuristics
-open BoardHelpers
 
 module TestLoop =
 

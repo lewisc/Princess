@@ -5,7 +5,6 @@ open System.IO
 open Primitives
 open BoardCombinators
 open TypedInput
-open BoardHelpers
 
               
 module Actions =
@@ -193,12 +192,12 @@ module Actions =
         let searchponder = payload.SearchPonder (fun () -> connection.NetStream.DataAvailable)
 
         //mainloop, play the game
-        let rec play gamestate (color:Color) =
+        let rec play (gamestate:GameState) (color:Color) =
 
             //end condition 1, should never be hit, but doesn't cause any problems
-            if isTerminal gamestate
-            then do printfn "%s\nthis shouldn't be hit" (sprintBoard gamestate)
-                 gamestate.Value,(notColor color)
+            if gamestate.IsTerminal()
+            then do printfn "%s\nthis shouldn't be hit" (gamestate.ToString())
+                 gamestate.Value,(color.Not())
 
             //determine the turn
             else match color with
@@ -208,11 +207,11 @@ module Actions =
                                    let (newmove,x) = searchprime gamestate
                                    let (newgame,_) = doUpdate gamestate newmove
                                    do printfn "Move %s, score %d" (sprintMove newmove) x
-                                   do printfn "%s" (sprintBoard newgame)
+                                   do printfn "%s" (newgame.ToString())
                                    if newmove <> ((-1,-1),(-1,-1)) then 
                                        do playMove connection newmove
                                    else do playMove connection (gamestate.AvailableMoves.Force().[0])
-                                   play newgame (notColor color)
+                                   play newgame (color.Not())
                  //get the result from pondering, we don't do anything with it, but
                  //future diagnostics may
                  //get the response fromt he server, play it internally
@@ -221,7 +220,7 @@ module Actions =
                         match response with
                         | Inplay(t) -> match t with
                                        | Some(move) -> let (newgame,_) = doUpdate gamestate move
-                                                       play newgame (notColor color)
+                                                       play newgame (color.Not())
                                     //this indicates that a parse error occurred, but technically
                                     //we might be able to muscle past
                                        | None ->  printfn "Didn't read a move when should have"
@@ -255,7 +254,7 @@ module Actions =
     ///accepts a game as color
     let doAcceptGame (connection:IMCSConnection) id color player =
         let activecolor = match color with
-                          | Some(x) -> printColor x
+                          | Some(x) -> x.ToString()
                           | None -> ""
         do connection.Writer.WriteLine(sprintf "accept %d %s" id activecolor)
         do connection.Writer.Flush()

@@ -1,7 +1,6 @@
 ﻿namespace Celestia
 
 open BoardCombinators
-open BoardHelpers
 open Primitives
 
 module Quiescence =
@@ -15,7 +14,7 @@ module Quiescence =
         else
         let localalpha = if value > alpha then value else alpha
         let captures = Array.choose (fun (x,(i,j)) -> match (node.BoardState.[i,j]) with
-                                                      | Some(p) when pieceColor p <> node.Turn -> Some(x,(i,j))
+                                                      | Some(p) when p.Color <> node.Turn -> Some(x,(i,j))
                                                       | _ -> None) (node.AvailableMoves.Force())
         let rec traverser alpha index =
             match index with
