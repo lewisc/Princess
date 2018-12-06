@@ -15,15 +15,15 @@ module MoveCalculation =
     //the different things that can happen with a move.
     //invalid represents a move such as trying to capture your own piece
     type private MoveType = 
-         | Capture of (Pieces * Position)
-         | Normal
-         | Invalid
+        | Capture of (Pieces * Position)
+        | Normal
+        | Invalid
 
     //Types of ways that a square can be captured
     type private PieceCaptures =
-         | Free
-         | Take
-         | Both
+        | Free
+        | Take
+        | Both
 
     //returns the possibilities for a move(capture, invalid, normal).
     //Normal moves can be continued, invalid/captures can't
