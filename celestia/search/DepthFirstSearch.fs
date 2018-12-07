@@ -2,7 +2,6 @@
 
 open System.Diagnostics
 
-open BoardCombinators
 open Primitives
 
 

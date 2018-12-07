@@ -36,10 +36,6 @@ module GameState =
         let mutable WhitePieces = piecesOfGame BoardState White
         let mutable BlackPieces = piecesOfGame BoardState Black
 
-        let mutable AvailableMoves = lazy(movesFrom (if Turn = White
-                                                     then WhitePieces
-                                                     else BlackPieces)
-                                                    BoardState)
 
         let mutable ZobristHash = zobristAdder BoardState
         let mutable ScoreIncrementor = { BlackScore = 0;
@@ -50,12 +46,19 @@ module GameState =
         let mutable Score = 0 
 
         let mutable UndoStack = []
+        
+        member val AvailableMoves = lazy(movesFrom (if Turn = White
+                                                    then WhitePieces
+                                                    else BlackPieces)
+                                                   BoardState)
+                                        with get, set
+
 
         ///undoes an update given an input
         member this.undoUpdate() : unit =
                 match UndoStack with
                 | prevState::newStack -> 
-                    do AvailableMoves <- prevState.OldMoves
+                    do this.AvailableMoves <- prevState.OldMoves
                     do WhitePieces <- prevState.OldWhite
                     do BlackPieces <- prevState.OldBlack
                     do ZobristHash <- prevState.OldHash
@@ -89,7 +92,7 @@ module GameState =
             do IsPlaying <- willplay
 
             // Update the undo stack with a new undoer                
-            UndoStack <- { OldMoves = AvailableMoves;
+            UndoStack <- { OldMoves = this.AvailableMoves;
                            OldWhite = WhitePieces;
                            OldBlack = BlackPieces;
                            OldHash = ZobristHash;
@@ -142,7 +145,7 @@ module GameState =
             let x3 = (capturepiece, (endx, endy))
             let x4 = (initialpiece,(startx, starty))
             do ZobristHash <- incrementalZobristAdder ZobristHash x1 x2 x3 x4
-            do AvailableMoves <- lazy(movesFrom newmoves BoardState)
+            do this.AvailableMoves <- lazy(movesFrom newmoves BoardState)
 
 
             do Turn <- Turn.Not()
