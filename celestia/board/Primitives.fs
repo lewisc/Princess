@@ -22,10 +22,10 @@ module Primitives =
 
     ///Infinity score, termination conditions
     [<Literal>]
-    let inf = 1000
+    let Inf = 1000
 
     /// A move that is in error, can not happen
-    let botMove = ((-1,-1),(-1,-1))
+    let BotMove = ((-1, -1), (-1, -1))
 
     ///Position on a board
     type Position = int * int
@@ -52,7 +52,6 @@ module Primitives =
     with override self.ToString() : string = match self with
                                              | Black -> "B"
                                              | White -> "W"
-
          ///inverts the given color(i.e. gives the color of opponent)
          member this.Not() : Color = match this with
                                      | Black -> White
@@ -81,11 +80,14 @@ module Primitives =
                                              | Pawn(White) -> "P"
                                              | Bishop(Black) -> "b"
                                              | Bishop(White) -> "B"
-
          ///return the color
          member self.Color : Color = match self with
-                                     | King(x) | Queen(x)| Knight(x) 
-                                     | Rook(x) | Pawn(x) | Bishop(x) -> x
+                                     | King(x)
+                                     | Queen(x)
+                                     | Knight(x) 
+                                     | Rook(x)
+                                     | Pawn(x)
+                                     | Bishop(x) -> x
 
     ///Board Type alias
     type Board = Pieces option [,]
@@ -130,8 +132,7 @@ module Primitives =
                          |> List.replicate 6
                          |> array2D
 
-        do List.map (fun (piece, (x, y)) ->
-                    emptyBoard.[y, x] <- Some(piece))
+        do List.map (fun (piece, (x, y)) -> emptyBoard.[y, x] <- Some(piece))
                     positions
            |> ignore
         emptyBoard

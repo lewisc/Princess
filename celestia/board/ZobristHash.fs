@@ -33,10 +33,10 @@ module ZobristHash =
     let private add64bit ()= 
         let retval = Array.create 8 0uy
         do rand.NextBytes(retval)
-        BitConverter.ToInt64(retval,0)
+        BitConverter.ToInt64(retval, 0)
 
     let private associater64 (elements:'a []) =
-        let rec adder (map:Set<int64>) =
+        let rec adder (map : Set<int64>) =
             if map.Count < elements.Length
             then    
                     adder (map.Add(add64bit()))

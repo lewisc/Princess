@@ -35,14 +35,14 @@ module MoveGeneration =
                     Invalid
                 else 
                     match (board.[x, y]) with
-                     //the case where the desitnation is empty
-                     | (None) -> Normal
-                     | (Some(z)) -> match (z.Color, hue) with 
-                                    //can't capture own piece
-                                    | (Black, Black) 
-                                    | (White, White) -> Invalid
-                                    | (Black, White) 
-                                    | (White, Black) -> Capture(z, (x, y))
+                    //the case where the desitnation is empty
+                    | None -> Normal
+                    | Some(z) -> match (z.Color, hue) with 
+                                 //can't capture own piece
+                                 | (Black, Black) 
+                                 | (White, White) -> Invalid
+                                 | (Black, White) 
+                                 | (White, Black) -> Capture(z, (x, y))
 
     //helper function that returns a list of 
     //possible moves along a dx/dy move allowance.
@@ -75,10 +75,10 @@ module MoveGeneration =
                                                        :: agg
                                          scanloop (count + 1) newAgg
                         | Capture(_) -> 
-                                    match attacktype with
-                                    | Free -> agg
-                                    | Both
-                                    | Take -> (((x, y), (xval, yval)) :: agg)
+                            match attacktype with
+                            | Free -> agg
+                            | Both
+                            | Take -> (((x, y), (xval, yval)) :: agg)
 
                 scanloop 1 []
       

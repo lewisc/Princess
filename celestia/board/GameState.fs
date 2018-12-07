@@ -25,63 +25,62 @@ module GameState =
     [<NoEquality; NoComparison>]
     type GameState(fitness : Evaluator, ?board : Board, ?turn : Color) =
 
-        let EvalFunc = fitness
-        let TimeOut = 81
-        let BoardState = defaultArg board (DefaultBoard ())
+        let evalFunc = fitness
+        let timeOut = 81
+        let boardState = defaultArg board (DefaultBoard ())
 
-        let mutable Turn = defaultArg turn White
-        let mutable IsPlaying = true
-        let mutable Index = 1
+        let mutable turn = defaultArg turn White
+        let mutable isPlaying = true
+        let mutable index = 1
 
-        let mutable WhitePieces = piecesOfGame BoardState White
-        let mutable BlackPieces = piecesOfGame BoardState Black
+        let mutable whitePieces = piecesOfGame boardState White
+        let mutable blackPieces = piecesOfGame boardState Black
 
 
-        let mutable ZobristHash = zobristAdder BoardState
-        let mutable ScoreIncrementor = { BlackScore = 0;
+        let mutable zobristHash = zobristAdder boardState
+        let mutable scoreIncrementor = { BlackScore = 0;
                                          WhiteScore = 0;
                                          Advancement = 0;
                                          BlackPawnScore = 0;
                                          WhitePawnScore = 0 }
-        let mutable Score = 0 
+        let mutable score = 0 
 
-        let mutable UndoStack = []
+        let mutable undoStack = []
+        let mutable availableMoves = lazy(movesFrom (if turn = White
+                                                     then whitePieces
+                                                     else blackPieces)
+                                                    boardState)
         
-        member val AvailableMoves = lazy(movesFrom (if Turn = White
-                                                    then WhitePieces
-                                                    else BlackPieces)
-                                                   BoardState)
-                                        with get, set
-
+        member this.AvailableMoves with get () = availableMoves
 
         ///undoes an update given an input
-        member this.undoUpdate() : unit =
-                match UndoStack with
+        member this.UndoUpdate() : unit =
+                match undoStack with
                 | prevState::newStack -> 
-                    do this.AvailableMoves <- prevState.OldMoves
-                    do WhitePieces <- prevState.OldWhite
-                    do BlackPieces <- prevState.OldBlack
-                    do ZobristHash <- prevState.OldHash
-                    do ScoreIncrementor<- prevState.OldState
-                    do Score <- prevState.OldValue
-                    do Turn <- Turn.Not()
-                    do IsPlaying <- true
-                    do Index <- Index-1
+                    do availableMoves <- prevState.OldMoves
+                    do whitePieces <- prevState.OldWhite
+                    do blackPieces <- prevState.OldBlack
+                    do zobristHash <- prevState.OldHash
+                    do scoreIncrementor<- prevState.OldState
+                    do score <- prevState.OldValue
+                    do turn <- turn.Not()
+                    do isPlaying <- true
+                    do index <- index-1
 
                     let (piece1, (oldsx, oldsy)) = prevState.OldPrevMove1
                     let (piece2, (oldex, oldey)) = prevState.OldPrevMove2
 
-                    do BoardState.[oldsx, oldsy] <- piece1
-                    do BoardState.[oldex, oldey] <- piece2
-                    do UndoStack <- newStack
+                    do boardState.[oldsx, oldsy] <- piece1
+                    do boardState.[oldex, oldey] <- piece2
+                    do undoStack <- newStack
                 | [] -> ()
 
         ///an unchecked update function, applies the move to the gamestate
-        member this.doUpdate((startx, starty), (endx, endy) : Position) =
+        member this.DoUpdate((startx, starty), (endx, endy) : Position) =
 
-            Turn <- Turn.Not()
-            let capturepiece = BoardState.[endx, endy]
-            let initialpiece = BoardState.[startx, starty]
+            turn <- turn.Not()
+            let capturepiece = boardState.[endx, endy]
+            let initialpiece = boardState.[startx, starty]
 
             let willplay = match capturepiece with
                            //king is captured, game over
@@ -89,90 +88,87 @@ module GameState =
                            //carry on
                            | _ -> true
 
-            do IsPlaying <- willplay
+            do isPlaying <- willplay
 
             // Update the undo stack with a new undoer                
-            UndoStack <- { OldMoves = this.AvailableMoves;
-                           OldWhite = WhitePieces;
-                           OldBlack = BlackPieces;
-                           OldHash = ZobristHash;
-                           OldState = ScoreIncrementor;
-                           OldValue = Score;
-                           OldPrevMove1 = (BoardState.[startx,starty],
-                                           (startx,starty));
-                           OldPrevMove2 = (BoardState.[endx,endy],
-                                           (endx,endy)); } :: UndoStack
+            undoStack <- { OldMoves = availableMoves;
+                           OldWhite = whitePieces;
+                           OldBlack = blackPieces;
+                           OldHash = zobristHash;
+                           OldState = scoreIncrementor;
+                           OldValue = score;
+                           OldPrevMove1 = (boardState.[startx, starty],
+                                           (startx, starty));
+                           OldPrevMove2 = (boardState.[endx, endy],
+                                           (endx, endy)); } :: undoStack
 
             //white goes to 0, black goes to N
             //These cases handle the pawn Promotion
-            let newPiece = match endx, initialpiece with
-                           | 0, Some(Pawn(Black)) -> Queen(Black)
-                           | MaxXVal, Some(Pawn(White)) -> Queen(White)
-                           | _, Some(other) -> other
-                           | _, None -> InvalidMove(((startx, starty),
-                                                     (endx, endy)), BoardState)
-                                        |> raise
+            let newPiece = match (endx, initialpiece) with
+                           | (0, Some(Pawn(Black))) -> Queen(Black)
+                           | (MaxXVal, Some(Pawn(White))) -> Queen(White)
+                           | (_, Some(other)) -> other
+                           | (_, None) -> InvalidMove(((startx, starty),
+                                                       (endx, endy)),
+                                                      boardState)
+                                          |> raise
 
             //assign the correct piece to the 
             //endpoint clear the beginning piece, determine whether
             //the game is continuing return a new board of the
             //appropriate type
 
-            BoardState.[endx, endy] <- Some(newPiece)
-            BoardState.[startx, starty] <- None
+            boardState.[endx, endy] <- Some(newPiece)
+            boardState.[startx, starty] <- None
 
-            let removeStart (_,x) = not (x = (startx, starty))
-            let removeEnd (_,x) = not (x = (endx, endy))
+            let removeStart (_,x) = x <> (startx, starty)
+            let removeEnd (_,x) = x <> (endx, endy)
 
-            let (blackPieces, whitePieces) = 
-                 match Turn.Not() with
-                 | Black -> (List.filter removeEnd BlackPieces,
-                             (newPiece,(endx, endy))
-                             :: List.filter removeStart WhitePieces)
-                 | White -> ((newPiece,(endx, endy))
-                             :: List.filter removeStart BlackPieces,
-                             List.filter removeEnd WhitePieces)
+            let (newBlackPieces, newWhitePieces) = 
+                 match turn.Not() with
+                 | Black -> (List.filter removeEnd blackPieces,
+                             (newPiece, (endx, endy))
+                             :: List.filter removeStart whitePieces)
+                 | White -> ((newPiece, (endx, endy))
+                             :: List.filter removeStart blackPieces,
+                             List.filter removeEnd whitePieces)
 
-            let newmoves = match Turn.Not() with
-                                   | Black -> blackPieces
-                                   | White -> whitePieces
+            let newMoves = match turn.Not() with
+                           | Black -> blackPieces
+                           | White -> whitePieces
 
-            do BlackPieces <- blackPieces
-            do WhitePieces <- whitePieces
+            do blackPieces <- newBlackPieces
+            do whitePieces <- newWhitePieces
 
-            let x1 = (None,(startx, starty))
+            let x1 = (None, (startx, starty))
             let x2 = (Some(newPiece), (endx, endy))
             let x3 = (capturepiece, (endx, endy))
-            let x4 = (initialpiece,(startx, starty))
-            do ZobristHash <- incrementalZobristAdder ZobristHash x1 x2 x3 x4
-            do this.AvailableMoves <- lazy(movesFrom newmoves BoardState)
+            let x4 = (initialpiece, (startx, starty))
+            do zobristHash <- incrementalZobristAdder zobristHash x1 x2 x3 x4
+            do availableMoves <- lazy(movesFrom newMoves boardState)
 
 
-            do Turn <- Turn.Not()
-            do Index <- Index+1
+            do turn <- turn.Not()
+            do index <- index+1
 
             let updater = 
-                    { OldPiece =(match initialpiece with 
+                    { OldPiece = match initialpiece with 
                                  | Some(t) -> t 
-                                 | _ -> raise <| Hell("invalid initialpiece"));
+                                 | _ -> raise <| Hell("invalid initialpiece");
                       NewPiece = newPiece;
                       Taken = capturepiece;
                       Move = ((startx, starty),(endx, endy)); }
 
-            let (newval, newinc) = EvalFunc updater
-            do Score <- newval
-            do ScoreIncrementor <- newinc
+            let (newval, newinc) = evalFunc updater
+            do score <- newval
+            do scoreIncrementor <- newinc
 
-            assert(BoardState.[startx, starty] <> None)
-            Score
+            assert(boardState.[startx, starty] <> None)
+            score
 
         ///returns whether or not the tested game is terminal
         member this.IsTerminal() : bool =
-                    if IsPlaying && Index <= TimeOut
-                    then
-                        false
-                    else 
-                        true
+                    isPlaying && index <= timeOut
 
         ///prints out the board state
         override this.ToString() : string =
@@ -184,9 +180,9 @@ module GameState =
                          | None -> "."
 
                      [ for i in 0 .. BoardLength do
-                           yield Array.toList BoardState.[i, *] ]
+                           yield Array.toList boardState.[i, *] ]
                      |> List.map (fun i -> List.map printer i
                                            |> String.concat "")
                      |> String.concat "\n"
-                     |> sprintf "turn:%d\n%s" Index
+                     |> sprintf "turn:%d\n%s" index
 
