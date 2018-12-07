@@ -71,7 +71,9 @@ module MoveGeneration =
                                      | Take -> agg
                                      | Both
                                      | Free ->  
-                                         scanloop (count + 1) (((x, y), (xval, yval)) :: agg)
+                                         let newAgg =  ((x, y), (xval, yval))
+                                                       :: agg
+                                         scanloop (count + 1) newAgg
                         | Capture(_) -> 
                                     match attacktype with
                                     | Free -> agg
