@@ -151,8 +151,8 @@ module MoveGeneration =
 
     //gets the available moves of a piece at a position on a 
     //given gameboard
-    let movesFrom (input : PieceLoc list) (board) : (Ply list) = 
+    let movesFrom (input : PieceLoc list) (board : Board) : (Ply list) = 
         //get all of the available moves
-        List.map (fun (piece,pos) -> validMoves piece pos board) input 
+        List.map (fun (piece, pos) -> validMoves piece pos board) input 
         |> List.concat
 
