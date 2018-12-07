@@ -9,7 +9,7 @@ module GameState =
     
     ///An undo struct that should have every necessary to unwork a move
     [<NoEquality; NoComparison>]
-    type private Undo = { OldMoves: Ply [] Lazy;
+    type private Undo = { OldMoves: Ply list Lazy;
                           OldWhite: (Pieces * Position) list;
                           OldBlack: (Pieces * Position) list;
                           OldHash: int64;
