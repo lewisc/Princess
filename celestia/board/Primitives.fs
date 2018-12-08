@@ -82,12 +82,8 @@ module Primitives =
                                              | Bishop(White) -> "B"
          ///return the color
          member self.Color : Color = match self with
-                                     | King(x)
-                                     | Queen(x)
-                                     | Knight(x) 
-                                     | Rook(x)
-                                     | Pawn(x)
-                                     | Bishop(x) -> x
+                                     | King(x) | Queen(x) | Knight(x) 
+                                     | Rook(x) | Pawn(x) | Bishop(x) -> x
 
     ///Board Type alias
     type Board = Pieces option [,]

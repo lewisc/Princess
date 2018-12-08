@@ -11,24 +11,11 @@ module MoveGeneration =
 
     //the different things that can happen with a move.
     //invalid represents a move such as trying to capture your own piece
-    type private MoveType = 
-        | Capture of (Pieces * Position)
-        | Normal
-        | Invalid
-
-    //Types of ways that a square can be captured
-    type private PieceCaptures =
-        | Free
-        | Take
-        | Both
-
-    //returns the possibilities for a move(capture, invalid, normal).
-    //Normal moves can be continued, invalid/captures can't
-    let inline private testValidMove (x : int)
-                                     (y : int)
-                                     (board : Board)
-                                     (hue : Color) : MoveType =
-
+    let private (|Capture|Normal|Invalid|) ((x : int),
+                                            (y : int),
+                                            (board : Board),
+                                            (hue : Color))  =
+ 
                 if (x > MaxXVal || x < 0 || y > MaxYVal || y < 0)
                 //if the move is off the board
                 then
@@ -42,7 +29,14 @@ module MoveGeneration =
                                  | (Black, Black) 
                                  | (White, White) -> Invalid
                                  | (Black, White) 
-                                 | (White, Black) -> Capture(z, (x, y))
+                                 | (White, Black) -> Capture
+
+    //Types of ways that a square can be captured
+    type private PieceCaptures =
+        | Free
+        | Take
+        | Both
+
 
     //helper function that returns a list of 
     //possible moves along a dx/dy move allowance.
@@ -65,7 +59,7 @@ module MoveGeneration =
                         let xval = x + count * dx
                         let yval = y + count * dy
                         //march through the possibilities
-                        match (testValidMove xval yval board hue) with
+                        match (xval, yval, board, hue) with
                         | Invalid -> agg
                         | Normal  -> match attacktype with
                                      | Take -> agg
@@ -74,7 +68,7 @@ module MoveGeneration =
                                          let newAgg =  ((x, y), (xval, yval))
                                                        :: agg
                                          scanloop (count + 1) newAgg
-                        | Capture(_) -> 
+                        | Capture -> 
                             match attacktype with
                             | Free -> agg
                             | Both
