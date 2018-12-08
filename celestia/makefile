@@ -6,7 +6,7 @@ libs=binaries
 folders=connection search board endgamedb players tables test
 
 
-all  : connection_all \
+all  : IMCSIO_all \
        search_all \
        board_all \
        endgamedb_all \
@@ -14,7 +14,7 @@ all  : connection_all \
        tables_all \
        test_all 
 
-include connection/build.mk \
+include IMCSIO/build.mk \
         search/build.mk \
         board/build.mk \
         endgamedb/build.mk \

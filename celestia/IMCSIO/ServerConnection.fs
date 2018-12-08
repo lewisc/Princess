@@ -5,6 +5,7 @@ open System.IO
 open Primitives
 open GameState
 open TypedInput
+open IMCSConnection
 
               
 module Actions =
@@ -15,9 +16,9 @@ module Actions =
         | End of Color
 
     [<NoEquality;NoComparison>]
-    type Player = {EvalFun:Evaluator;
-                   SearchPrime:int64->GameState->(Ply*Score);
-                   SearchPonder:((unit->bool)->GameState->(Ply*Score));}
+    type Player = { EvalFun : Evaluator;
+                    SearchPrime : int64->GameState->(Ply*Score);
+                    SearchPonder : ((unit->bool)->GameState->(Ply*Score));}
 
     ///attempts to read a single line from a connection, has a timeout
     ///of timeout milliseconds
@@ -201,7 +202,7 @@ module Actions =
             //the opponents color(which should switch to pondering)
             | x when x = initialcolor-> 
                 let (newmove, x) = searchprime gamestate
-                let score = gamestate.doUpdate(newmove)
+                let score = gamestate.DoUpdate(newmove)
                 do printfn "Move %s, score %d" (sprintMove newmove) score
                 do printfn "%s" (gamestate.ToString())
                 if newmove <> ((-1,-1),(-1,-1)) then 
@@ -215,7 +216,7 @@ module Actions =
                    let response = readToGameStop connection
                    match response with
                    | Inplay(t) -> match t with
-                                  | Some(move) -> do gamestate.doUpdate(move) |> ignore
+                                  | Some(move) -> do gamestate.DoUpdate(move) |> ignore
                                                   play (color.Not())
                                //this indicates that a parse error occurred, but technically
                                //we might be able to muscle past

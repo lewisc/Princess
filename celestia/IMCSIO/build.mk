@@ -1,26 +1,26 @@
-connection_all : $(libs)/IMCSConnection.dll \
+IMCSIO_all : $(libs)/IMCSConnection.dll \
                  $(libs)/TypedInput.dll \
                  $(libs)/ServerConnection.dll
 
-$(libs)/TypedInput.dll : connection/TypedInput.fs
+$(libs)/TypedInput.dll : IMCSIO/TypedInput.fs
 	$(fsc) $(optimize) -a \
                        --out:$(libs)/TypedInput.dll \
-                       connection/TypedInput.fs
+                       IMCSIO/TypedInput.fs
 
-$(libs)/IMCSConnection.dll : connection/IMCSConnection.fs
+$(libs)/IMCSConnection.dll : IMCSIO/IMCSConnection.fs
 	$(fsc) $(optimize) -a \
                        --out:$(libs)/IMCSConnection.dll \
-                       connection/IMCSConnection.fs
+                       IMCSIO/IMCSConnection.fs
 
 $(libs)/ServerConnection.dll : $(libs)/Primitives.dll \
                                $(libs)/IMCSConnection.dll \
                                $(libs)/TypedInput.dll \
                                $(libs)/GameState.dll \
-                               connection/ServerConnection.fs 
+                               IMCSIO/ServerConnection.fs 
 	$(fsc) $(optimize) -r:Primitives.dll \
                        -r:IMCSConnection.dll \
                        -r:TypedInput.dll \
                        -r:GameState.dll \
                        -a \
                        --out:$(libs)/ServerConnection.dll \
-                       connection/ServerConnection.fs
+                       IMCSIO/ServerConnection.fs
