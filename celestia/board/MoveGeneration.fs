@@ -9,34 +9,39 @@ open ZobristHash
 
 module MoveGeneration =
 
-    //the different things that can happen with a move.
-    //invalid represents a move such as trying to capture your own piece
-    let private (|Capture|Normal|Invalid|) ((x : int),
-                                            (y : int),
-                                            (board : Board),
-                                            (hue : Color))  =
- 
-                if (x > MaxXVal || x < 0 || y > MaxYVal || y < 0)
-                //if the move is off the board
-                then
-                    Invalid
-                else 
-                    match (board.[x, y]) with
-                    //the case where the desitnation is empty
-                    | None -> Normal
-                    | Some(z) -> match (z.Color, hue) with 
-                                 //can't capture own piece
-                                 | (Black, Black) 
-                                 | (White, White) -> Invalid
-                                 | (Black, White) 
-                                 | (White, Black) -> Capture
-
-    //Types of ways that a square can be captured
+    ///Types of ways that a square can be captured
     type private PieceCaptures =
         | Free
         | Take
         | Both
 
+
+    //the different things that can happen with a move.
+    //invalid represents a move such as trying to capture your own piece
+    let private (|Capture|Invalid|NoCapture|) ((x : int),
+                                               (y : int),
+                                               (board : Board),
+                                               (hue : Color),
+                                               (attackType : PieceCaptures))  =
+ 
+        if (x > MaxXVal || x < 0 || y > MaxYVal || y < 0)
+        //if the move is off the board
+        then
+            Invalid
+        else 
+            match (board.[x, y], attackType) with
+            //the case where the desitnation is empty
+            | None, Free
+            | None, Both -> NoCapture
+            | Some(z), Take
+            | Some(z), Both -> match (z.Color, hue) with 
+                               //can't capture own piece
+                               | (Black, Black) 
+                               | (White, White) -> Invalid
+                               | (Black, White) 
+                               | (White, Black) -> Capture
+            | None, Take
+            | Some(_), Free -> Invalid
 
     //helper function that returns a list of 
     //possible moves along a dx/dy move allowance.
@@ -44,37 +49,28 @@ module MoveGeneration =
     let inline private scanMovesGame ((x, y) : Position)
                                      (board : Board)
                                      (hue : Color)
-                                     (attacktype : PieceCaptures)
+                                     (attackType : PieceCaptures)
                                      (endcount : int)
                                      (dx : int)
                                      (dy : int) : Ply list =
 
+        //march through the possibilities
+        let rec scanloop count agg = 
+            if endcount < count 
+            then
+                agg
+            else
+
+                let xval = x + count * dx
+                let yval = y + count * dy
                 //march through the possibilities
-                let rec scanloop count agg = 
-                    if endcount < count 
-                    then
-                        agg
-                    else
+                match (xval, yval, board, hue, attackType) with
+                | Invalid -> agg
+                | NoCapture -> let newAgg = ((x, y), (xval, yval)) :: agg
+                               scanloop (count + 1) newAgg
+                | Capture -> (((x, y), (xval, yval)) :: agg)
 
-                        let xval = x + count * dx
-                        let yval = y + count * dy
-                        //march through the possibilities
-                        match (xval, yval, board, hue) with
-                        | Invalid -> agg
-                        | Normal  -> match attacktype with
-                                     | Take -> agg
-                                     | Both
-                                     | Free ->  
-                                         let newAgg =  ((x, y), (xval, yval))
-                                                       :: agg
-                                         scanloop (count + 1) newAgg
-                        | Capture -> 
-                            match attacktype with
-                            | Free -> agg
-                            | Both
-                            | Take -> (((x, y), (xval, yval)) :: agg)
-
-                scanloop 1 []
+        scanloop 1 []
       
     //gets a list of all valid moves from a 
     //piece at a given coordinate(can be a hypothetical piece)

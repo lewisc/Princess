@@ -36,6 +36,7 @@ module ZobristHash =
         BitConverter.ToInt64(retval, 0)
 
     let private associater64 (elements:'a []) =
+        //TODO: This needs to be a fold
         let rec adder (map : Set<int64>) =
             if map.Count < elements.Length
             then    
