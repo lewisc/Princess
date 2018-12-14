@@ -52,8 +52,10 @@ module GameState =
         
         member this.AvailableMoves with get () = availableMoves
 
+        //TODO: REconsider hbing these have a backing value
         member this.Turn with get () = turn
         member this.Value with get () = score
+        member this.ZobristHash with get () = zobristHash.ZobristValue
 
         ///undoes an update given an input
         member this.UndoUpdate() : unit =

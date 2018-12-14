@@ -48,12 +48,14 @@ $(libs)/AlphaBeta.dll : $(libs)/DepthFirstSearch.dll \
 $(libs)/AlphaBetaID.dll : $(libs)/DepthFirstSearch.dll \
                           $(libs)/Primitives.dll \
                           $(libs)/Quiescence.dll \
+						  $(libs)/GameState.dll \
                           $(libs)/AlphaBeta.dll \
                           $(libs)/TranspositionTable.dll \
                           search/AlphaBetaID.fs
 	$(fsc) $(optimize) -r:DepthFirstSearch.dll \
                        -r:Primitives.dll \
                        -r:Quiescence.dll \
+                       -r:GameState.dll \
                        -r:AlphaBeta.dll \
                        -r:TranspositionTable.dll \
                        -a \
