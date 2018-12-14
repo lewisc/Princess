@@ -8,6 +8,7 @@ open Primitives
 
 
 ///Calculates a Zobrist key for the minichess board
+//TODO: Document
 module ZobristHash =
 
     type ZobristHash(board : Board) = 

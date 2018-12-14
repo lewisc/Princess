@@ -52,6 +52,9 @@ module GameState =
         
         member this.AvailableMoves with get () = availableMoves
 
+        member this.Turn with get () = turn
+        member this.Value with get () = score
+
         ///undoes an update given an input
         member this.UndoUpdate() : unit =
                 match undoStack with
@@ -191,7 +194,3 @@ module GameState =
                      |> sprintf "turn:%d\n%s" index
 
 
-    [<NoEquality;NoComparison>]
-    type Player = { EvalFun : Evaluator;
-                    SearchPrime : int64->GameState->(Ply*Score);
-                    SearchPonder : ((unit->bool)->GameState->(Ply*Score));}

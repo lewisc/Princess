@@ -3,6 +3,7 @@
 open System.Text
 open System.Text.RegularExpressions
 
+//TODO: DOcument
 module TypedInput =
     //active pattern for regex parsing
     //Shamelessly cribbed from MSDN

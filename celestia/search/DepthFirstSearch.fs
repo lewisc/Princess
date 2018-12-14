@@ -3,83 +3,70 @@
 open System.Diagnostics
 
 open Primitives
+open GameState
 
 
+// TODO: Document
 module DepthFirstSearch =
+
     exception SearchException of string
 
 
     let counter = ref 0
 
+    
+    let doUndoDfs driver (depth:int) (game : GameState) =
 
-    let doUndoDfs driver depth game side =
-        let movelist = game.AvailableMoves.Force()
-        let maxmove = movelist.Length
-        let rec searcher depth side undoer (move, score) index=
-            match index with
-            | x -> 
-                let head = movelist.[x]
-                let (newgame,newundo) = doUpdate game head
-                let (_,newtest) =  driver (depth-1) newgame -side
-                do undoUpdate game newundo
-                let testval = -newtest
-                searcher depth side (Some(newundo)) (if testval > (score) then (head, testval) else (move,score)) (index+1)
+        let searcher (highMove, score) move =
+                do game.DoUpdate move |> ignore
+                let (_, value) =  driver (depth - 1) game
+                let retVal = -value
+                do game.UndoUpdate ()
+                (if retVal > score then (Some(move), retVal) else (highMove, score))
 
-            | y when y >= maxmove  -> (move,score)
-
-        let ret = searcher depth side None (botMove, -inf-1000) 0
-        ret
-
-    let onPlay game = match game.Turn with 
-                             | Black -> -1
-                             | White -> 1
+        List.fold searcher (None, -Inf) (game.AvailableMoves.Force())
 
     ///naive depth first search using depth limiter
-    let DepthFirstSearchFrame maxer (depth:int) (game:GameState) : (Ply * Score) =
-        let myTurn = onPlay game
+    let DepthFirstSearchFrame maxer (depth:int) (game:GameState) : (Ply option * Score) =
 
-        let rec searcher d (game:GameState) side =
+        let rec searcher d (game:GameState) =
             match d with
             //terminal Node
-            | x when x = 0 || (game.IsTerminal()) -> 
-                                    let movescore = game.Value
-                                    (botMove,(movescore * side))
+            | x when x = 0 || (game.IsTerminal()) -> (None, game.Value)
             //the max of the child moves, each child move gets mapped to 
             //it's associated score
-            | _ -> maxer searcher d game side
+            | _ -> maxer searcher d game
 
-        let ret = searcher depth game myTurn
-        ret
+        searcher depth game
 
                             
 
     ///a timed version of the naive dfs, frameworked to have swappable
     ///underlying behavior
-    let IterativeDeepenerFrame maxer time  (game:GameState) : Ply * Score =
-        let myturn = onPlay game
+    let IterativeDeepenerFrame maxer time (game:GameState) : Ply option * Score =
         let timer = Stopwatch.StartNew()
 
         // seacher, has a time check
-        let rec searcher depth (game:GameState) side : (Ply * Score) =
+        let rec searcher depth (game:GameState) : (Ply option * Score) =
             if timer.ElapsedMilliseconds >= time 
-            then (botMove,-inf  ) else
-
-            match depth with
-            | x when x = 0 || (game.IsTerminal()) -> 
-                            let movescore = game.Value
-                            (botMove,(movescore * side))
-            | _ -> maxer searcher depth game side
+            then
+                (None, -Inf)
+            else
+                match depth with
+                | x when x = 0 || (game.IsTerminal()) -> (None, game.Value)
+                | _ -> maxer searcher depth game
 
         //driver, keeps going until the alarm rings
         let rec driver currdepth currbestmove =
-            let newmove = searcher currdepth game myturn
+            let newmove = searcher currdepth game
 
             //if we found a win, return it, if we found a lose, return our next best move
             if timer.ElapsedMilliseconds >= time then currbestmove 
-            elif (snd newmove) >= (inf/2) then newmove
-            elif (snd newmove) <= (-inf/2) then currbestmove
+            elif (snd newmove) >= (Inf/2) then newmove
+            elif (snd newmove) <= (-Inf/2) then currbestmove
             else driver (currdepth+2) newmove 
-        driver 2 ((game.AvailableMoves.Force()).[0],-1)
 
-    let IterativeDeepenerDoUndo = IterativeDeepenerFrame doUndoDfs
-    let DepthFirstSearchdoUndo = DepthFirstSearchFrame doUndoDfs
+        driver 2 (None, -Inf)
+
+    let IterativeDeepenerDoUndo :int64 -> GameState -> Ply option * Score = IterativeDeepenerFrame doUndoDfs
+    let DepthFirstSearchdoUndo :int -> GameState -> Ply option * Score = DepthFirstSearchFrame doUndoDfs

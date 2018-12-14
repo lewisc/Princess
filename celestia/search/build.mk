@@ -59,8 +59,10 @@ $(libs)/AlphaBetaID.dll : $(libs)/DepthFirstSearch.dll \
                        search/AlphaBetaID.fs
 
 $(libs)/DepthFirstSearch.dll : $(libs)/Primitives.dll \
+                               $(libs)/GameState.dll \
                                search/DepthFirstSearch.fs
 	$(fsc) $(optimize) -r:Primitives.dll \
+                       -r:GameState.dll \
                        -a \
                        --out:$(libs)/DepthFirstSearch.dll \
                        search/DepthFirstSearch.fs

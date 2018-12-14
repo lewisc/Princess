@@ -8,6 +8,7 @@ open Primitives
 open GameState
 open TypedInput
 
+//TODO: Evaluate docs
 module IMCSConnection = 
 
     ///Something went wrong while playing
@@ -18,14 +19,22 @@ module IMCSConnection =
 
     ///Invalid protocol exception, for when unknown protocol events occur
     exception ProtocolError of string
+    ///
+    ///A Record with everything necessary to execute a game. A user of
+    ///this library only needs this to play
+    [<NoEquality;NoComparison>]
+    type Player = { EvalFun : Evaluator;
+                    SearchPrime : int64->GameState->(Ply*Score);
+                    SearchPonder : ((unit->bool)->GameState->(Ply*Score));}
 
-        
     ///This type encapsulates a number of helper pieces for
     ///connecting to an IMCS server, namely the reader the writer
     ///the client and the network stream. Everything is wired up
     ///properly by the constructor
     ///this class implements IDisposable so as to be able to 
     ///clean up the underlying streams
+    //TODO: Make the read stream accept any stream not just
+    //a network.
     type IMCSConnection(server, port) as self = 
 
         do (self.Writer : StreamWriter).AutoFlush <- true
