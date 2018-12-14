@@ -34,14 +34,14 @@ $(libs)/AlphaBeta.dll : $(libs)/DepthFirstSearch.dll \
                         $(libs)/Primitives.dll \
                         $(libs)/Quiescence.dll \
                         $(libs)/TranspositionTable.dll \
-                        search/AlphaBeta2.fs
+                        search/AlphaBeta.fs
 	$(fsc) $(optimize) -r:DepthFirstSearch.dll \
                        -r:Primitives.dll \
                        -r:Quiescence.dll \
                        -r:TranspositionTable.dll \
                        -a \
                        --out:$(libs)/AlphaBeta.dll \
-                       search/AlphaBeta2.fs
+                       search/AlphaBeta.fs
 
 $(libs)/AlphaBetaID.dll : $(libs)/DepthFirstSearch.dll \
                           $(libs)/Primitives.dll \

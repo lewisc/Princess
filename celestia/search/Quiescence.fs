@@ -1,8 +1,9 @@
 ﻿namespace Celestia
 
-open BoardCombinators
+open GameState
 open Primitives
 
+//TODO: DOcument
 module Quiescence =
     
 
@@ -17,6 +18,7 @@ module Quiescence =
                                                       | Some(p) when p.Color <> node.Turn -> Some(x,(i,j))
                                                       | _ -> None) (node.AvailableMoves.Force())
         let rec traverser alpha index =
+            //TODO: this should be a fold
             match index with
             | x -> let (newgame,newundo) = doUpdate node captures.[x]
                    let neweval = -(quiesce newgame -beta -alpha)

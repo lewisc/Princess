@@ -7,14 +7,9 @@ open GameState
 
 
 // TODO: Document
+// TODO: Cleanup
 module DepthFirstSearch =
 
-    exception SearchException of string
-
-
-    let counter = ref 0
-
-    
     let doUndoDfs driver (depth:int) (game : GameState) =
 
         let searcher (highMove, score) move =

@@ -11,15 +11,10 @@ open TypedInput
 //TODO: Evaluate docs
 module IMCSConnection = 
 
-    ///Something went wrong while playing
-    exception PlayingError of string
-
-    ///Something went wrong with the connection
-    exception ConnectionError of string
-
+    //TODO: rename
     ///Invalid protocol exception, for when unknown protocol events occur
     exception ProtocolError of string
-    ///
+
     ///A Record with everything necessary to execute a game. A user of
     ///this library only needs this to play
     [<NoEquality;NoComparison>]

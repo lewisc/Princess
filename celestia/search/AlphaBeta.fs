@@ -8,6 +8,8 @@ open Primitives
 
 open System.Diagnostics
 
+//TODO: Cleanup
+//TODO: DOcument
 module AlphaBeta2 =
 
     let newwhitehit = ref 0
