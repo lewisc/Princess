@@ -7,61 +7,56 @@ open System.Collections.Generic
 open Primitives
 
 
+///Calculates a Zobrist key for the minichess board
 module ZobristHash =
 
-    let private piecesOption = [| Some(King(Black));
-                                  Some(Queen(Black));
-                                  Some(Knight(Black));
-                                  Some(Rook(Black));
-                                  Some(Pawn(Black));
-                                  Some(Bishop(Black)); 
-                                  Some(King(White));
-                                  Some(Queen(White));
-                                  Some(Knight(White));
-                                  Some(Rook(White));
-                                  Some(Pawn(White));
-                                  Some(Bishop(White)); |]
+    type ZobristHash(board : Board) = 
 
-    let private pieceXPosition = piecesOption
-                                 |> Array.map (fun x ->
-                                        Array.map (fun y ->
-                                            (x, y)) AllPositions)
-                                 |> Array.concat
+        static let piecesOption : Pieces option [] =
+            [| Some(King(Black));
+               Some(Queen(Black));
+               Some(Knight(Black));
+               Some(Rook(Black));
+               Some(Pawn(Black));
+               Some(Bishop(Black)); 
+               Some(King(White));
+               Some(Queen(White));
+               Some(Knight(White));
+               Some(Rook(White));
+               Some(Pawn(White));
+               Some(Bishop(White)); |]
 
-    let private rand = Random()
+        static let pieceXPosition : (Pieces option * Position) list =
+            [ for pos in AllPositions do
+                  for piece in piecesOption do
+                      yield (piece, pos) ]
 
-    let private add64bit ()= 
-        let retval = Array.create 8 0uy
-        do rand.NextBytes(retval)
-        BitConverter.ToInt64(retval, 0)
+        static let rand : Random = Random()
 
-    let private associater64 (elements:'a []) =
-        //TODO: This needs to be a fold
-        let rec adder (map : Set<int64>) =
-            if map.Count < elements.Length
-            then    
-                    adder (map.Add(add64bit()))
-            else map
-        let ret map = Set.toArray map
-                   |> Array.zip elements
-        let mymap = adder Set.empty
-        ret mymap
+        static let get64bit () : int64 = 
+            let retval = Array.create 8 0uy
+            do rand.NextBytes(retval)
+            BitConverter.ToInt64(retval, 0)
 
-    let private zobristMap = 
-                let keys = associater64 pieceXPosition
-                let todictionary = Dictionary<(Pieces option * Position),
-                                               int64>(390)
-                Array.iter(fun (x, y) -> todictionary.Add(x, y)) keys
-                todictionary
+        static let zobristMap :
+            IDictionary<(Pieces option * Position), (int64)> =
+            pieceXPosition
+            |> Seq.map (fun piece -> (piece, get64bit ()))
+            |> dict
 
-    let zobristAdder (input : Board) =
-        let ret = Array.fold (fun x (z1, z2) ->
-                x ^^^ (zobristMap.[input.[z1, z2], (z1, z2)])) 0L AllPositions
-        ret
+        let mutable zobristValue : int64 =
+                Array.fold (fun x (z1, z2) ->
+                                x ^^^ (zobristMap.[board.[z1, z2], (z1, z2)]))
+                           0L AllPositions
 
-    let incrementalZobristAdder zobristHash x1 x2 x3 x4 = 
-            zobristHash 
-            ^^^ (zobristMap.[x1])
-            ^^^ (zobristMap.[x2])
-            ^^^ (zobristMap.[x3])
-            ^^^ (zobristMap.[x4])
+        member self.ZobristValue
+            with get () = zobristValue
+            and private set(value) = zobristValue <- value
+            
+
+        member self.IncrementalAdder x1 x2 x3 x4 = 
+                self.ZobristValue  <- self.ZobristValue
+                                      ^^^ (zobristMap.[x1])
+                                      ^^^ (zobristMap.[x2])
+                                      ^^^ (zobristMap.[x3])
+                                      ^^^ (zobristMap.[x4])

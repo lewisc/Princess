@@ -12,7 +12,6 @@ module GameState =
     type private Undo = { OldMoves: Ply list Lazy;
                           OldWhite: (Pieces * Position) list;
                           OldBlack: (Pieces * Position) list;
-                          OldHash: int64;
                           OldState: Incrementor;
                           OldValue: Score;
                           OldPrevMove1: Pieces option * Position;
@@ -37,7 +36,7 @@ module GameState =
         let mutable blackPieces = piecesOfGame boardState Black
 
 
-        let mutable zobristHash = zobristAdder boardState
+        let zobristHash = new ZobristHash(boardState)
         let mutable scoreIncrementor = { BlackScore = 0;
                                          WhiteScore = 0;
                                          Advancement = 0;
@@ -60,15 +59,21 @@ module GameState =
                     do availableMoves <- prevState.OldMoves
                     do whitePieces <- prevState.OldWhite
                     do blackPieces <- prevState.OldBlack
-                    do zobristHash <- prevState.OldHash
-                    do scoreIncrementor<- prevState.OldState
+                    do scoreIncrementor <- prevState.OldState
                     do score <- prevState.OldValue
                     do turn <- turn.Not()
                     do isPlaying <- true
                     do index <- index-1
 
+
                     let (piece1, (oldsx, oldsy)) = prevState.OldPrevMove1
                     let (piece2, (oldex, oldey)) = prevState.OldPrevMove2
+
+                    let x1 = (piece2, (oldex, oldey))
+                    let x4 = (piece2, (oldsx, oldsy))
+                    let x2 = (piece1, (oldsx, oldsy))
+                    let x3 = (piece1, (oldex, oldey))
+                    do zobristHash.IncrementalAdder x1 x2 x3 x4
 
                     do boardState.[oldsx, oldsy] <- piece1
                     do boardState.[oldex, oldey] <- piece2
@@ -94,7 +99,6 @@ module GameState =
             undoStack <- { OldMoves = availableMoves;
                            OldWhite = whitePieces;
                            OldBlack = blackPieces;
-                           OldHash = zobristHash;
                            OldState = scoreIncrementor;
                            OldValue = score;
                            OldPrevMove1 = (boardState.[startx, starty],
@@ -144,7 +148,7 @@ module GameState =
             let x2 = (Some(newPiece), (endx, endy))
             let x3 = (capturepiece, (endx, endy))
             let x4 = (initialpiece, (startx, starty))
-            do zobristHash <- incrementalZobristAdder zobristHash x1 x2 x3 x4
+            do zobristHash.IncrementalAdder x1 x2 x3 x4
             do availableMoves <- lazy(movesFrom newMoves boardState)
 
 
@@ -186,3 +190,8 @@ module GameState =
                      |> String.concat "\n"
                      |> sprintf "turn:%d\n%s" index
 
+
+    [<NoEquality;NoComparison>]
+    type Player = { EvalFun : Evaluator;
+                    SearchPrime : int64->GameState->(Ply*Score);
+                    SearchPonder : ((unit->bool)->GameState->(Ply*Score));}

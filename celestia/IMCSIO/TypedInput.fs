@@ -30,8 +30,18 @@ module TypedInput =
     //strongly typed input
     let (|ReadInput|_|) input =
         match input with 
-        | ParseRegex "!\s?([a-e])([1-6])-([a-e])([1-6])" 
-                [ ColToNum fx; Integer fy; ColToNum tx; Integer ty ] 
-                    -> Some(((fy-1), fx), ((ty-1), tx))
-        | _ -> None
+        | None -> None
+        | Some(s) ->
+            match s with 
+            | ParseRegex "!\s?([a-e])([1-6])-([a-e])([1-6])" 
+                    [ ColToNum fx; Integer fy; ColToNum tx; Integer ty ] 
+                        -> Some(((fy-1), fx), ((ty-1), tx))
+            | _ -> None
 
+    let (|PacketLine|_|) (inputString : string option)
+                         : (string * (string list)) option =
+        match inputString with
+        | None -> None
+        | Some(s) -> match Array.toList (s.Trim().Split[|' '|]) with
+                     | (marker :: _) as packet -> Some(marker, packet)
+                     | [] -> None

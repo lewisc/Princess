@@ -68,7 +68,7 @@ module MoveGeneration =
                 | Invalid -> agg
                 | NoCapture -> let newAgg = ((x, y), (xval, yval)) :: agg
                                scanloop (count + 1) newAgg
-                | Capture -> (((x, y), (xval, yval)) :: agg)
+                | Capture -> ((x, y), (xval, yval)) :: agg
 
         scanloop 1 []
       
@@ -143,6 +143,5 @@ module MoveGeneration =
     //given gameboard
     let movesFrom (input : PieceLoc list) (board : Board) : (Ply list) = 
         //get all of the available moves
-        List.map (fun (piece, pos) -> validMoves piece pos board) input 
-        |> List.concat
+        List.collect (fun (piece, pos) -> validMoves piece pos board) input 
 

@@ -10,17 +10,6 @@ open TypedInput
 
 module IMCSConnection = 
 
-    ///used to determine whether the game is continuting  or someone has one
-    type Status =
-        | Inplay of Ply option
-        | End of Color
-
-
-    [<NoEquality;NoComparison>]
-    type Player = { EvalFun : Evaluator;
-                    SearchPrime : int64->GameState->(Ply*Score);
-                    SearchPonder : ((unit->bool)->GameState->(Ply*Score));}
-
     ///Something went wrong while playing
     exception PlayingError of string
 
@@ -30,31 +19,6 @@ module IMCSConnection =
     ///Invalid protocol exception, for when unknown protocol events occur
     exception ProtocolError of string
 
-    let private (|Matched|_|) (expectedValue : string)
-                              (inputString : string option) : string [] option =
-        match inputString with
-        | None -> None
-        | Some(s) -> let trimmedString = s.Trim().Split[|' '|]
-                     if trimmedString.Length > 0
-                     then
-                         if String.Equals(inputString, expectedValue)
-                         then Some(trimmedString)
-                         else None
-                     else
-                         None
-
-    let private (|Unmatched|_|) (expectedValue : string)
-                                (inputString : string option) : string [] option =
-        match inputString with
-        | None -> None
-        | Some(s) -> let trimmedString = s.Trim().Split[|' '|]
-                     if trimmedString.Length > 0
-                     then
-                         if String.Equals(inputString, expectedValue)
-                         then None
-                         else Some(trimmedString)
-                     else
-                         None
         
     ///This type encapsulates a number of helper pieces for
     ///connecting to an IMCS server, namely the reader the writer
@@ -95,6 +59,7 @@ module IMCSConnection =
         ///returns the underlying writer, autoflush is
         ///enabled
         member this.Writer = new StreamWriter(this.NetStream)
+
         //the constructor just creates everything and
         //wraps everything
         ///The Dispose method destroys the underlying
@@ -105,7 +70,7 @@ module IMCSConnection =
 
         ///attempts to read a single line from a connection, has a timeout
         ///of timeout milliseconds
-        member self.ReadLine (timeout : int) : string option =
+        member private self.ReadLine (timeout : int) : string option =
             //this reads the old timeout, writes the new one
             // andthen returns the old one after everything is done
             let oldto = self.NetStream.ReadTimeout
@@ -122,44 +87,41 @@ module IMCSConnection =
 
         ///Reads the input to a given symbol, if the server waits more than 
         ///timeout ms the function will return all data gathered up to that point
-        member self.ReadToSymbol (sym : string) timeout : string list =
+        member private self.ReadAdminPacket () : string list list =
             let rec reader agg =
-                match (self.ReadLine(timeout)) with
-                | Matched sym line -> List.rev ((Array.toList line) @ agg)
-                | Unmatched sym line -> reader ((Array.toList line) @ agg)
-                | _ -> List.rev agg
+                match (self.ReadLine(500)) with
+                | PacketLine (".", packet) -> (agg @ [packet])
+                | PacketLine (_, line) -> reader (agg @ [line])
+                // Drop empty lines
+                | _ -> reader agg
             reader []
 
-        ///Reads to . waiting up to 500ms before transmission
-        member self.ReadToEOM () : string list =
-            self.ReadToSymbol "." 500
-    
-    
         ///executes a command that returns a single line of result
-        member self.ExecuteLine (input:string) retcode =
+        member private self.ExecuteLine (input:string) retCode =
             do self.Writer.WriteLine(input)
             do self.Writer.Flush()
             match (self.ReadLine 500) with
-            | Matched retcode content -> content :: []
-            | Unmatched retcode _ -> raise (ProtocolError(sprintf "Expected %s" retcode))
-            | _ ->  raise (ProtocolError("invalid response, not correct string"))
-    
+            | PacketLine (seen, content) when seen = retCode -> content
+            | PacketLine (wrong, _) ->
+                ProtocolError(sprintf "Error: Expected %s got %s" retCode wrong)
+                |> raise
+            | _ ->  raise (ProtocolError("Error: no response"))
     
         ///executes a command that returns a . delimeted packet
-        member self.ExecuteCommand (input:string) retcode : string list =
+        member private self.ExecuteCommand (input : string)
+                                           (retCode : string)
+                                           : string list list =
             do self.Writer.WriteLine(input)
             do self.Writer.Flush()
-            let message = self.ReadToEOM ()
-            match (None) with
-            | Matched retcode content -> Array.toList content
-            | _ ->  raise (ProtocolError("invalid response, not correct string"))
+            match self.ReadAdminPacket() with
+            | (seen :: x) :: y when seen = retCode -> x :: y
+            | (wrong :: x) :: y -> 
+                ProtocolError(sprintf "Error: Expected %s got %s" retCode wrong)
+                |> raise
+            | _ ->  raise (ProtocolError("Error: no response"))
             
         ///clears outthe buffer and insures that the connection went through
-        member self.Connect = 
-            let test = self.ReadLine 500
-            match self.ReadLine 500 with 
-            | Matched "100" content -> content
-            | _ ->  raise (ProtocolError("invalid response, not correct string"))
+        member self.Connect with get ()  = self.ExecuteLine "" "100"
     
         ///gets the list of available games
         member self.GetList with get () = self.ExecuteCommand "list" "211"
@@ -171,62 +133,32 @@ module IMCSConnection =
         member self.DoQuit () = self.ExecuteLine "quit" "200"
     
         ///authenticates as user=name, password = pass
-        member self.BindName name pass = self.ExecuteLine (sprintf "me %s %s" name pass) "201"
+        member self.BindName name pass =
+            self.ExecuteLine (sprintf "me %s %s" name pass) "201"
     
         ///cleans all the stalled games that are active
         member self.DoClean () = self.ExecuteLine "clean" "204"
     
         ///gets the results of the ratings
-        member self.GetRatings with get () = self.ExecuteCommand "ratings" "212"
+        member self.GetRatings with get () = self.ExecuteCommand
+                                                "ratings" "212"
     
-        ///parses an input of games
-        ///TODO: Clean this up
-        member self.GetGames input =
-            let getgameval (inval : string) =
-                match Int32.TryParse(inval.Trim().Split([|' '|]).[0]) with
-                | (false, _) -> None
-                | (true, x) -> Some(x, inval.Trim())
-            List.choose getgameval input
-    
-                  
-        member self.ReadToGameStop () =
-            //parses the input
-            let chooser x = match x with
-                             | ReadInput(y) -> Some(y)
-                             | _ -> None
-        
-            let rec reader agg =
-                    match (self.ReadLine -1) with
-                    | Some(content) 
-                        when not (String.Equals(content.Trim(),String.Empty)) -> 
-                                match content.Trim().Split([|' '|]).[0] with
-                                //if we got an symbol stop and return 
-                                //the list in the correct(backwards) order
-                                | line when String.Equals(line, "?") ->   
-                                            let moves =  List.choose chooser agg
-                                            match List.length moves with 
-                                            | x when x > 1 -> 
-                                               (ProtocolError("more than 1 move"))
-                                               |> raise
-                                            | 1 -> Inplay(Some(moves.Head))
-                                            | _ -> Inplay(None)
-                                       //endgame case
-                                | line when String.Equals(line, "=") -> 
-                                            //note using content not line
-                                     End(match content.Split([|' '|]).[1] with  
-                                         | "W" -> White 
-                                         | "B" -> Black 
-                                         | x -> raise <| ProtocolError
-                                                   (sprintf "invalid winner: %s" x))
-                                | line -> reader (content::agg)
-                    | Some(content) ->  reader agg
-                    //if we got an error code stop and return the list 
-                    //in the correct(backwards) order
-                    | None -> raise <| ProtocolError("invalid game string")
-            reader []
+        member private self.ReadGamePacket () =
+            let rec reader (move, packet) =
+                match (self.ReadLine(500)) with
+                | ReadInput x -> reader (Some(x), packet)
+                | PacketLine ("?", line) -> (move, packet @ [line])
+                | PacketLine ("=", line) ->
+                    match self.ReadLine 500 with
+                    | PacketLine summary-> (None, packet @ [line; snd summary])
+                    | _ -> (None, packet @ [line])
+                | PacketLine line -> reader (move, packet @ [snd line])
+                // Drop empty lines
+                | _ -> reader (move, packet)
+            reader (None, [])
             
         ///plays a move and then gets the output
-        member self.PlayMove (input : Ply) =
+        member private self.PlayMove (input : Ply) =
             do self.Writer.WriteLine(sprintMove input)
             do self.Writer.Flush()
 
@@ -247,52 +179,47 @@ module IMCSConnection =
                 match color with
                 //my turn, calculate the nexmove, play it, call play with 
                 //the opponents color(which should switch to pondering)
-                | x when x = initialcolor-> 
-                    let (newmove, x) = searchprime gamestate
+                | x when x = initialcolor -> 
+                    let (newmove, _) = searchprime gamestate
                     let score = gamestate.DoUpdate(newmove)
+                    //TODO: Gate this
+                    //Also print everything including the packet info
                     do printfn "Move %s, score %d" (sprintMove newmove) score
                     do printfn "%s" (gamestate.ToString())
-                    if newmove <> ((-1,-1),(-1,-1)) then 
-                        do self.PlayMove newmove
-                    else do self.PlayMove (gamestate.AvailableMoves.Force().[0])
+
+                    do self.PlayMove newmove
+
                     play (color.Not())
                 //get the result from pondering, we don't do anything with it, but
                 //future diagnostics may
                 //get the response fromt he server, play it internally
                 | _ -> let result = searchponder gamestate
-                       let response = self.ReadToGameStop ()
+                       let (response, returnval) = self.ReadGamePacket ()
                        match response with
-                       | Inplay(t) -> match t with
-                                      | Some(move) -> do gamestate.DoUpdate(move) |> ignore
-                                                      play (color.Not())
-                                   //this indicates that a parse error occurred, but technically
-                                   //we might be able to muscle past
-                                      | None ->  printfn "Didn't read a move when should have"
-                                                 play (color)
+                       | Some(move) -> do gamestate.DoUpdate(move) |> ignore
+                                       play (color.Not())
                        //or exit out, this is the endcase that should always occur
-                       | End(t) -> 1000000, t
+                       | None -> returnval
             //first move is by white, if that's me then search activates, if that's not me then ponder
             //activates
-            play White
+            match initialcolor with
+            | Black -> play Black
+            | White -> do self.ReadGamePacket |> ignore
+                       play White
 
-                        
-            
         ///offers a game as color, for my time, with their time
+        //TODO: Default arguments are a thing
         member self.DoOfferGame color mytime theirtime player =
             let mycolor = defaultArg (color) ""
             let play1time = defaultArg (mytime) ""
             let play2time = defaultArg (theirtime) ""
         
             let retval = self.ExecuteLine (sprintf "offer %s %s %s" mycolor play1time play2time) "103"
-            let tester = self.Reader.ReadLine()
-            let color  = match (tester.Split(' ').[1]) with
-                         | "W" | "w" -> White
-                         | "B" | "b" -> Black
+            let color  = match retval with
+                         | _ :: "W" :: _ | _ :: "w" :: _ -> White
+                         | _ :: "B" :: _ | _ :: "b" :: _ -> Black
                          | _ -> raise (Hell("invalid color"))
-            match color with
-            | Black -> self.PlayGame player color
-            | White -> do self.ReadToGameStop |> ignore
-                       self.PlayGame player color
+            self.PlayGame player color
 
 
         ///accepts a game as color
@@ -304,12 +231,7 @@ module IMCSConnection =
             do self.Writer.Flush()
             let mycolor = 
                 match (self.ReadLine 500) with
-                | Matched "105" _ -> White
-                | Matched "106" _ -> Black
+                | PacketLine ("105", _)  -> White
+                | PacketLine ("106", _) -> Black
                 | _ -> raise (ProtocolError(sprintf "Expected 105 or 106"))
-            match mycolor with
-            | Black -> self.PlayGame player Black
-            | White -> do self.ReadToGameStop |> ignore
-                       self.PlayGame player White
-
-
+            self.PlayGame player mycolor
