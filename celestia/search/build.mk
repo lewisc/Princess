@@ -24,8 +24,10 @@ $(libs)/Heuristics.dll : $(libs)/Primitives.dll \
                        search/Heuristics.fs
 
 $(libs)/Quiescence.dll : $(libs)/Primitives.dll \
+						 $(libs)/GameState.dll \
                          search/Quiescence.fs
 	$(fsc) $(optimize) -r:Primitives.dll \
+                       -r:GameState.dll \
                        -a \
                        --out:$(libs)/Quiescence.dll \
                        search/Quiescence.fs

@@ -7,27 +7,28 @@ open Primitives
 module Quiescence =
     
 
-    let rec quiesce node alpha beta =
+    let rec quiesce (node: GameState) alpha beta =
         let value = node.Value
 
         if value >= beta then
             beta
         else
         let localalpha = if value > alpha then value else alpha
-        let captures = Array.choose (fun (x,(i,j)) -> match (node.BoardState.[i,j]) with
-                                                      | Some(p) when p.Color <> node.Turn -> Some(x,(i,j))
-                                                      | _ -> None) (node.AvailableMoves.Force())
-        let rec traverser alpha index =
-            //TODO: this should be a fold
-            match index with
-            | x -> let (newgame,newundo) = doUpdate node captures.[x]
-                   let neweval = -(quiesce newgame -beta -alpha)
-                   do undoUpdate newgame newundo
-                   if neweval >= beta then
-                       neweval
-                   else traverser (max alpha neweval) (x+1)
-            | y when y > captures.Length -> alpha
-        traverser localalpha 0
+        let captures = (List.map (fun move -> let score = node.DoUpdate move
+                                              do node.UndoUpdate ()
+                                              (abs(score-value), move))
+                                  (node.AvailableMoves.Force()))
+                        |> List.filter (fun (x, move) -> x > 10)
+                        |> List.map snd
+
+        let traverser alpha move =
+            do node.DoUpdate move |> ignore
+            let neweval = -(quiesce node -beta -alpha)
+            do node.UndoUpdate ()
+            if neweval >= beta then
+                neweval
+            else (max alpha neweval)
+        List.fold traverser localalpha captures
 
 
 
