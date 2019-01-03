@@ -1,6 +1,5 @@
 
 search_all : $(libs)/DepthFirstSearch.dll \
-             $(libs)/AlphaBetaID.dll \
              $(libs)/Heuristics.dll \
              $(libs)/Quiescence.dll \
              $(libs)/MTDF.dll \
@@ -17,8 +16,10 @@ $(libs)/MTDF.dll : $(libs)/AlphaBeta.dll \
                        search/MTDF.fs
 
 $(libs)/Heuristics.dll : $(libs)/Primitives.dll \
+                         $(libs)/GameState.dll \
                          search/Heuristics.fs
 	$(fsc) $(optimize) -r:Primitives.dll \
+                       -r:GameState.dll \
                        -a \
                        --out:$(libs)/Heuristics.dll \
                        search/Heuristics.fs
@@ -44,23 +45,6 @@ $(libs)/AlphaBeta.dll : $(libs)/DepthFirstSearch.dll \
                        -a \
                        --out:$(libs)/AlphaBeta.dll \
                        search/AlphaBeta.fs
-
-$(libs)/AlphaBetaID.dll : $(libs)/DepthFirstSearch.dll \
-                          $(libs)/Primitives.dll \
-                          $(libs)/Quiescence.dll \
-						  $(libs)/GameState.dll \
-                          $(libs)/AlphaBeta.dll \
-                          $(libs)/TranspositionTable.dll \
-                          search/AlphaBetaID.fs
-	$(fsc) $(optimize) -r:DepthFirstSearch.dll \
-                       -r:Primitives.dll \
-                       -r:Quiescence.dll \
-                       -r:GameState.dll \
-                       -r:AlphaBeta.dll \
-                       -r:TranspositionTable.dll \
-                       -a \
-                        --out:$(libs)/AlphaBetaID.dll \
-                       search/AlphaBetaID.fs
 
 $(libs)/DepthFirstSearch.dll : $(libs)/Primitives.dll \
                                $(libs)/GameState.dll \

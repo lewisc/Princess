@@ -12,7 +12,6 @@ module GameState =
     type private Undo = { OldMoves: Ply list Lazy;
                           OldWhite: (Pieces * Position) list;
                           OldBlack: (Pieces * Position) list;
-                          OldState: Incrementor;
                           OldValue: Score;
                           OldPrevMove1: Pieces option * Position;
                           OldPrevMove2: Pieces option * Position; }
@@ -22,7 +21,10 @@ module GameState =
     ///This is mutable to be able to use a do/undo style semantics for
     ///performance
     [<NoEquality; NoComparison>]
-    type GameState(fitness : Evaluator, ?board : Board, ?turn : Color) =
+    type GameState(fitness : Evaluator,
+                   initialIncrementor : Board -> Score,
+                   ?board : Board,
+                   ?turn : Color) =
 
         let evalFunc = fitness
         let timeOut = 81
@@ -37,12 +39,7 @@ module GameState =
 
 
         let zobristHash = new ZobristHash(boardState)
-        let mutable scoreIncrementor = { BlackScore = 0;
-                                         WhiteScore = 0;
-                                         Advancement = 0;
-                                         BlackPawnScore = 0;
-                                         WhitePawnScore = 0 }
-        let mutable score = 0 
+        let mutable score = initialIncrementor boardState
 
         let mutable undoStack = []
         let mutable availableMoves = lazy(movesFrom (if turn = White
@@ -54,8 +51,10 @@ module GameState =
 
         //TODO: REconsider hbing these have a backing value
         member this.Turn with get () = turn
-        member this.Value with get () = score
+        member this.Score with get () = score
         member this.ZobristHash with get () = zobristHash.ZobristValue
+        member this.WhitePieces with get () = whitePieces
+        member this.BlackPieces with get () = blackPieces 
 
         ///undoes an update given an input
         member this.UndoUpdate() : unit =
@@ -64,7 +63,6 @@ module GameState =
                     do availableMoves <- prevState.OldMoves
                     do whitePieces <- prevState.OldWhite
                     do blackPieces <- prevState.OldBlack
-                    do scoreIncrementor <- prevState.OldState
                     do score <- prevState.OldValue
                     do turn <- turn.Not()
                     do isPlaying <- true
@@ -104,7 +102,6 @@ module GameState =
             undoStack <- { OldMoves = availableMoves;
                            OldWhite = whitePieces;
                            OldBlack = blackPieces;
-                           OldState = scoreIncrementor;
                            OldValue = score;
                            OldPrevMove1 = (boardState.[startx, starty],
                                            (startx, starty));
@@ -168,9 +165,8 @@ module GameState =
                       Taken = capturepiece;
                       Move = ((startx, starty),(endx, endy)); }
 
-            let (newval, newinc) = evalFunc updater
+            let newval = evalFunc updater
             do score <- newval
-            do scoreIncrementor <- newinc
 
             assert(boardState.[startx, starty] <> None)
             score

@@ -10,7 +10,7 @@ open GameState
 // TODO: Cleanup
 module DepthFirstSearch =
 
-    let doUndoDfs driver (depth:int) (game : GameState) =
+    let doUndoDfs driver (depth : int) (game : GameState) =
 
         let searcher (highMove, score) move =
                 do game.DoUpdate move |> ignore
@@ -24,10 +24,10 @@ module DepthFirstSearch =
     ///naive depth first search using depth limiter
     let DepthFirstSearchFrame maxer (depth:int) (game:GameState) : (Ply option * Score) =
 
-        let rec searcher d (game:GameState) =
+        let rec searcher d (game : GameState) =
             match d with
             //terminal Node
-            | x when x = 0 || (game.IsTerminal()) -> (None, game.Value)
+            | x when x = 0 || (game.IsTerminal()) -> (None, game.Score)
             //the max of the child moves, each child move gets mapped to 
             //it's associated score
             | _ -> maxer searcher d game
@@ -48,7 +48,7 @@ module DepthFirstSearch =
                 (None, -Inf)
             else
                 match depth with
-                | x when x = 0 || (game.IsTerminal()) -> (None, game.Value)
+                | x when x = 0 || (game.IsTerminal()) -> (None, game.Score)
                 | _ -> maxer searcher depth game
 
         //driver, keeps going until the alarm rings
@@ -63,5 +63,5 @@ module DepthFirstSearch =
 
         driver 2 (None, -Inf)
 
-    let IterativeDeepenerDoUndo :int64 -> GameState -> Ply option * Score = IterativeDeepenerFrame doUndoDfs
-    let DepthFirstSearchdoUndo :int -> GameState -> Ply option * Score = DepthFirstSearchFrame doUndoDfs
+    let IterativeDeepenerDoUndo time game : Ply option * Score = IterativeDeepenerFrame doUndoDfs time game
+    let DepthFirstSearchdoUndo time game : Ply option * Score = DepthFirstSearchFrame doUndoDfs time game

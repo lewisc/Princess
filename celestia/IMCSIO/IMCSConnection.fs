@@ -19,8 +19,8 @@ module IMCSConnection =
     ///this library only needs this to play
     [<NoEquality;NoComparison>]
     type Player = { EvalFun : Evaluator;
-                    SearchPrime : int64->GameState->(Ply*Score);
-                    SearchPonder : ((unit->bool)->GameState->(Ply*Score));}
+                    SearchPrime : int64 -> GameState -> (Ply * Score);
+                    SearchPonder : ((unit -> bool) -> GameState -> (Ply * Score));}
 
     ///This type encapsulates a number of helper pieces for
     ///connecting to an IMCS server, namely the reader the writer
@@ -166,9 +166,9 @@ module IMCSConnection =
             do self.Writer.WriteLine(sprintMove input)
             do self.Writer.Flush()
 
-        member self.PlayGame (payload : Player) (initialcolor) =
+        member self.PlayGame (payload : Player) (initialcolor) initialIncrementor =
             //initialize the gamestate
-            let gamestate = new GameState(payload.EvalFun)
+            let gamestate = new GameState(payload.EvalFun, initialIncrementor)
             
             //search for 8 seconds
             //TODO:make this dynamic

@@ -138,15 +138,6 @@ module Primitives =
     [<NoEquality; NoComparison>]
     exception public InvalidMove of Ply * Board
 
-    ///Incremental evaluation state
-    //TODO:Should be genericized
-    [<StructAttribute>]
-    type Incrementor = { BlackScore: Score;
-                         WhiteScore: Score;
-                         Advancement: Score;
-                         BlackPawnScore: Score;
-                         WhitePawnScore: Score; }
-
     /// used to update state
     type StateUpdate = { OldPiece: Pieces;
                          NewPiece: Pieces;
@@ -154,4 +145,4 @@ module Primitives =
                          Move: Ply; }
 
     ///the type that incrementally evaluates the gamestate
-    type Evaluator = StateUpdate -> Score * Incrementor
+    type Evaluator = StateUpdate -> Score

@@ -8,7 +8,7 @@ module Quiescence =
     
 
     let rec quiesce (node: GameState) alpha beta =
-        let value = node.Value
+        let value = node.Score
 
         if value >= beta then
             beta
