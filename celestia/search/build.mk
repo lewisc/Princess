@@ -2,8 +2,8 @@
 search_all : $(libs)/DepthFirstSearch.dll \
              $(libs)/Heuristics.dll \
              $(libs)/Quiescence.dll \
-             $(libs)/MTDF.dll \
              $(libs)/AlphaBeta.dll
+#             $(libs)/MTDF.dll \
 
 $(libs)/MTDF.dll : $(libs)/AlphaBeta.dll \
                    search/MTDF.fs

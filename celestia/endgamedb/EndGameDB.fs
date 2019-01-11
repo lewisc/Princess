@@ -3,11 +3,10 @@
 open System.Runtime.Serialization.Formatters.Binary
 open System.Runtime.Serialization
 
-open MTDF
-open AlphaBeta2
+open AlphaBeta
 open Primitives
-open BoardCombinators
 open Heuristics
+open GameState
 
 open System
 open System.Collections.Generic
@@ -96,10 +95,6 @@ module EndGameDB =
         seq { for i in pieces4 do
                 for (j,k,l,m) in positions4 do
                    yield  ((j,i.[0]),(k,i.[1]),(l,i.[2]),(m,i.[3]))}
-
-    let comparison game1 game2 =
-        game1.Turn = game2.Turn &&
-        game1.BoardState = game2.BoardState
 
     //keep iterating until you hit fixpointgg
 //    let rec fixCounter

@@ -1,9 +1,10 @@
 ﻿namespace Celestia
-open BoardCombinators
+
 open TranspositionTable
 open System.Diagnostics
 open Primitives
-open AlphaBeta2
+open GameState
+open AlphaBeta
 open DepthFirstSearch
 
 module MTDF =
@@ -23,7 +24,7 @@ module MTDF =
             let beta = if g = low then g+1 else g
 
             //zerowindow t table AB search(d-1 for unrolled root node)
-            let (newg) = AlphaBetaTT root (d-1) (beta-1) beta 
+            let newg = AlphaBetaTT root (d-1) (beta-1) beta 
             //either we found a new high or we found a new low
             let newlow = if not (newg < beta) then newg else low
             let newhigh = if newg < beta then newg else up
@@ -39,13 +40,13 @@ module MTDF =
         //search on those best guesses, and then return the
         //results
         let mapper r x =
-            let (newgame,newundo) = doUpdate r x
+            let score = r.DoUpdate(x)
             let guess = match (getTranspose game.ZobristHash 0 game.Turn) with
                         | Some(_,x) -> x
                         | _ -> game.Value 
 
-            let ret = searcher newgame guess inf (-inf)
-            do undoUpdate newgame newundo
+            let ret = searcher newgame guess Inf (-Inf)
+            do r.UndoUpdate()
             (x,ret)
         //get the results
         let retval = Array.map (mapper game) (game.AvailableMoves.Force())
@@ -63,7 +64,7 @@ module MTDF =
         let rec searcher depth root g up low =
             //if time is up, get out and return invalid
             if timer.ElapsedMilliseconds >= time
-            then -inf-1000
+            then -Inf - 1000
             else
             let beta = if g = low then g+10 else g
 
@@ -80,34 +81,34 @@ module MTDF =
         let rec deepener currdepth currbestmove bestguesslist =
 
             //unroll the top node
-            let mutable curralpha = -inf
+            let mutable curralpha = -Inf
             let (movelist:(Ply*int) option []) = Array.create 600 None
             let mutable index = 0
-            let mutable bestmove = (botMove,-inf-1000)
+            let mutable bestmove = (botMove, -Inf - 1000)
 
             for l in bestguesslist do
                 let appmove = fst l
                 let appscore = snd l
-                let (newnode,undo) = doUpdate game  appmove
-                let newalpha = -(searcher (currdepth-1) newnode -appscore -curralpha -inf)
+                let score = game.DoUpdate(appmove)
+                let newalpha = -(searcher (currdepth-1) newnode -appscore -curralpha -Inf)
                 do movelist.[index] <- Some(appmove,newalpha)
                 do index <- index + 1
                 do curralpha <- newalpha
                 if newalpha > (snd bestmove) then
                     do bestmove <- (appmove,newalpha)
                 else ()
-                do undoUpdate newnode undo
+                do game.UndoUpdate()
                        
             //if we found a win, return it, if we founda lose, return our next best move
             //note, there's an extremely unlikely bug here
             if timer.ElapsedMilliseconds >= time then 
                     do printfn "searchdepth %d" (currdepth-2)
                     currbestmove
-            elif (snd bestmove) >= (inf/2) then bestmove
-            elif (snd bestmove) <= (-inf/2) then currbestmove
+            elif (snd bestmove) >= (Inf / 2) then bestmove
+            elif (snd bestmove) <= (-Inf / 2) then currbestmove
             else deepener (currdepth+2) bestmove (Array.sortBy snd (Array.choose (fun x -> x) movelist))
 
         //run the deepener, start at 0 to get good first guesses, build an initial value with
         //0's which are basically discarded since the depth 0 search just gets the moves score
-        deepener 0 (botMove,(-inf-1000)) (Array.map (fun x -> x,0) (game.AvailableMoves.Force()))
+        deepener 0 (botMove,(-Inf - 1000)) (Array.map (fun x -> x,0) (game.AvailableMoves.Force()))
             
