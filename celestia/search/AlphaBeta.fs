@@ -10,13 +10,14 @@ open System.Diagnostics
 
 //TODO: Cleanup
 //TODO: DOcument
-module AlphaBeta2 =
+module AlphaBeta =
 
     [<Literal>]
     let sortdepth = 5 
 
     //TODO Reintroduce transposition tables
-    let sortMoves moveslist (game: GameState) depth =
+    let sortMoves (moveslist : Ply list)
+                  (game : GameState) (depth : int) : Ply list =
         if depth < sortdepth then moveslist else
         moveslist
         |> List.map (fun move -> 
@@ -27,10 +28,10 @@ module AlphaBeta2 =
         |> List.map snd
 
 
-    
-    let AlphaBeta (node:GameState) depth alpha beta =
+    let AlphaBeta (node : GameState) (depth : int) : int =
         //Requires explicit searcher recursion since there's no failfast
         //fold
+
         let rec searcher currentalpha currentbeta currentdepth moves =
             match moves with
             | [] -> currentalpha
@@ -40,7 +41,7 @@ module AlphaBeta2 =
                 //negamax depth
                 //Gdo deeper
                 let newScore = -(match (currentdepth - 1) with 
-                                 | x when x <= 0 || node.IsTerminal() -> node.Value
+                                 | x when x <= 0 || node.IsTerminal() -> node.Score
                                  | _ -> searcher -currentbeta -currentalpha (currentdepth - 1) (node.AvailableMoves.Force()))
                 do node.UndoUpdate ()
                 //alpha prune
@@ -50,9 +51,10 @@ module AlphaBeta2 =
                 //continue traveling breadthwise
                 else searcher newalpha currentbeta currentdepth more
 
-        searcher alpha beta depth (node.AvailableMoves.Force())
+        searcher (-Inf) (Inf) depth (node.AvailableMoves.Force())
 
-    let AlphaBetaTT (node:GameState) depth alpha beta =
+    let AlphaBetaTT (node : GameState) (depth : int) : int =
+
         let rec searcher origalpha currentalpha currentbeta currentdepth moves =
              match moves with 
              | [] -> 
@@ -69,7 +71,7 @@ module AlphaBeta2 =
                  currentalpha
              //travel along the breadth
              | move :: more ->
-                 let score = node.DoUpdate move
+                 let score = node.DoUpdate(move)
                  //travel the depth
                  let newtest = -(match (currentdepth - 1) with 
                                  | x when x <= 0 || node.IsTerminal() -> quiesce node -currentbeta -currentalpha
@@ -79,7 +81,7 @@ module AlphaBeta2 =
                                         | Some(Transpose.Lower, x) when x >= -currentalpha -> x
                                         | _ -> searcher -currentbeta -currentbeta -currentalpha (currentdepth - 1) (sortMoves (node.AvailableMoves.Force()) node (currentdepth - 1)))
                  //do undo
-                 do node.UndoUpdate ()
+                 do node.UndoUpdate()
                  //alpha prune
                  let newalpha = max currentalpha newtest
                  //beta prune
@@ -90,26 +92,26 @@ module AlphaBeta2 =
                  //continue traveling breadthwise
                  else searcher origalpha newalpha currentbeta currentdepth more
                                 
-        searcher alpha alpha beta depth (sortMoves (node.AvailableMoves.Force()) node (depth))
+        searcher (-Inf) (-Inf) Inf depth (sortMoves (node.AvailableMoves.Force()) node (depth))
 
-    let AlphaBetaDFSID node time alpha beta =
+    let AlphaBetaDFSID (node : GameState) time alpha beta =
         let timer = Stopwatch.StartNew()
         let rec searcher currentalpha currentbeta movelist currentdepth : int =
             match movelist with
             //travel along the breadth
             |  move :: more ->  
-                 let score = node.DoUpdate head
+                 let score = node.DoUpdate move
                  //negamax depth
                  let newtest = -(match (currentdepth - 1) with 
-                                 | x when x <= 0 || newnode.IsTerminal() -> score
-                                 | _ -> searcher -currentbeta -currentalpha (newnode.AvailableMoves.Force()) (currentdepth-1))
-                 do node.UndoUpdate () 
+                                 | x when x <= 0 || node.IsTerminal() -> score
+                                 | _ -> searcher -currentbeta -currentalpha (node.AvailableMoves.Force()) (currentdepth-1))
+                 do node.UndoUpdate() 
                  //alpha prune
                  let newalpha = max currentalpha newtest
                  //beta prune
                  if newalpha >= currentbeta then newalpha
                  //TODO: move this out of thematch
-                 elif timer.ElapsedMilliseconds > time then -inf-1000
+                 elif timer.ElapsedMilliseconds > time then -Inf-1000
                  //continue traveling breadthwise
                  else searcher newalpha currentbeta movelist currentdepth
 
@@ -118,123 +120,123 @@ module AlphaBeta2 =
         //iterative deepening
         let rec deepener appdepth currbestmove =
 
-            let newmove = Array.map (fun (y) -> let score = node.DoUpdate y
-                                                //TODO: Failout if terminal
-                                                let retval = (y, -(searcher alpha beta node (newnode.AvailableMoves.Force()) (appdepth - 1)))
-                                                do node.undoUpdate 
-                                                retval) (node.AvailableMoves.Force())
-                          |> Array.maxBy snd
+            let newmove = List.map (fun (y) -> let score = node.DoUpdate(y)
+                                               //TODO: Failout if terminal
+                                               let retval = (y, -(searcher alpha beta (node.AvailableMoves.Force()) (appdepth - 1)))
+                                               do node.UndoUpdate()
+                                               retval) (node.AvailableMoves.Force())
+                          |> List.maxBy snd
             if timer.ElapsedMilliseconds >= time then 
                     do printfn "searchdepth %d" (appdepth-2)
                     currbestmove
             //if we hit an endgame
-            elif (snd newmove) >= inf / 2 then newmove
-            elif (snd newmove) < -inf / 2 then currbestmove
+            elif (snd newmove) >= Inf / 2 then newmove
+            elif (snd newmove) < -Inf / 2 then currbestmove
             //otherwise keep going by 2
             else deepener (appdepth+2) newmove
-        deepener 0 (botMove, -inf - 1000)
+        deepener 0 (BotMove, -Inf - 1000)
 
-    let AlphaBetaDFSTT node time alpha beta =
+    let AlphaBetaDFSTT (node : GameState) (time : int64) : Ply * int =
+
         let timer = Stopwatch.StartNew()
         let moves = sortMoves (node.AvailableMoves.Force()) node 10
+
         let rec searcher origalpha currentalpha currentbeta movelist currentdepth =
             match movelist with 
             //travel along the breadth
             | move :: more ->  
-                let score = node.DoUpdate move
+                let score = node.DoUpdate(move)
                 //travel the depth
                 let newtest =  -(match currentdepth-1 with 
-                                 | x when x <= 0 || newnode.IsTerminal() -> newnode.Value
-                                 | _ ->  match (getTranspose newnode.ZobristHash (currentdepth-1) newnode.Turn) with
+                                 | x when x <= 0 || node.IsTerminal() -> node.Score
+                                 | _ ->  match (getTranspose node.ZobristHash (currentdepth-1) node.Turn) with
                                          | Some(Transpose.Exact,x) -> x
                                          | Some(Transpose.Upper,x) when x <= -currentbeta-> x
                                          | Some(Transpose.Lower,x) when x >= -currentalpha -> x
-                                         | _ ->  searcher -currentbeta -currentbeta -currentalpha newnode 0 (newnode.AvailableMoves.Force()) (currentdepth-1))                                
+                                         | _ ->  searcher -currentbeta -currentbeta -currentalpha (node.AvailableMoves.Force()) (currentdepth - 1))
                 //do undo
-                do undoUpdate newnode newundo 
+                do node.UndoUpdate()
                 //alpha prune
                 let newalpha = max currentalpha newtest
                 //beta prune
                 if newalpha >= currentbeta then
                 //since we didn't continue this is a lower bound
-                            do setTranspose currentnode.ZobristHash newalpha Transpose.Lower currentdepth currentnode.Turn
+                            do setTranspose node.ZobristHash newalpha Transpose.Lower currentdepth node.Turn
                             newalpha
                 //continue traveling breadthwise
-                elif timer.ElapsedMilliseconds > time then -inf-1000
-                else searcher origalpha newalpha currentbeta currentnode (x+1) movelist currentdepth
+                elif timer.ElapsedMilliseconds > time then -Inf - 1000
+                else searcher origalpha newalpha currentbeta movelist currentdepth
                    
             | _ -> if currentalpha > origalpha && currentalpha < currentbeta then 
-                                                                                    //in window, perfect hit
-                                                                                    do setTranspose currentnode.ZobristHash currentalpha Transpose.Exact currentdepth currentnode.Turn
-                                                                                    //since we don't know if we got this or something less than this, this is
-                                                                                    //an upperbound
-                   elif currentalpha <= origalpha then do setTranspose currentnode.ZobristHash currentalpha Transpose.Upper currentdepth currentnode.Turn
+                       //in window, perfect hit
+                       do setTranspose node.ZobristHash currentalpha Transpose.Exact currentdepth node.Turn
+                       //since we don't know if we got this or something less than this, this is
+                       //an upperbound
+                   elif currentalpha <= origalpha then do setTranspose node.ZobristHash currentalpha Transpose.Upper currentdepth node.Turn
                    else ()
                    currentalpha
         //iterative deepening
         let rec deepener appdepth currbestmove =
 
-            let mutable curralpha = -inf
+            let mutable curralpha = -Inf
             let mutable movelist = []
-            let mutable bestmove = (botMove,-inf-1000)
+            let mutable bestmove = (BotMove,-Inf-1000)
 
             for i in moves do
-                let (newnode,undo) = doUpdate node i 
-                let newalpha = -(searcher -inf -inf -curralpha newnode 0 (newnode.AvailableMoves.Force()) (appdepth-1))
+                let score = node.DoUpdate(i) 
+                let newalpha = -(searcher -Inf -Inf -curralpha (node.AvailableMoves.Force()) (appdepth-1))
                 do movelist <- (i,newalpha)::movelist
                 do curralpha <- newalpha
                 if newalpha > (snd bestmove) then
                     do bestmove <- (i,newalpha)
                 else ()
-                do undoUpdate newnode undo
+                do node.UndoUpdate()
 
 
             if timer.ElapsedMilliseconds >= time then 
                     do printfn "searchdepth %d" (appdepth-2)
                     currbestmove
             //if we hit an endgame
-            elif (snd bestmove) >= inf/2 then bestmove
-            elif (snd bestmove) < -inf/2 then currbestmove
+            elif (snd bestmove) >= Inf/2 then bestmove
+            elif (snd bestmove) < -Inf/2 then currbestmove
             //otherwise keep going by 2
             else deepener (appdepth+2) bestmove
-        deepener 0 (botMove,-inf-1000)
+        deepener 0 (BotMove, -Inf - 1000)
 
-    let Ponder pred node =
-        let rec searcher origalpha currentalpha currentbeta currentnode index (movelist:Ply []) currentdepth =
-            if pred() then -inf-1000
+    let Ponder pred (node : GameState) =
+        let rec searcher origalpha currentalpha currentbeta (movelist:Ply list) currentdepth =
+            if pred() then -Inf-1000
             else
-            match index with 
+            match movelist with 
             //travel along the breadth
-            | x when x < movelist.Length ->  
-                             let head = movelist.[x]
-                             let (newnode,newundo) = doUpdate currentnode head
-                             //travel the depth
-                             let newtest =  -(match currentdepth-1 with 
-                                              | x when x <= 0 || newnode.IsTerminal() -> newnode.Value
-                                              | _ ->  match (getTranspose newnode.ZobristHash (currentdepth-1) newnode.Turn) with
-                                                      | Some(Transpose.Exact,x) -> x
-                                                      | Some(Transpose.Upper,x) when x <= -currentbeta-> x
-                                                      | Some(Transpose.Lower,x) when x >= -currentalpha -> x
-                                                      | _ ->  searcher -currentbeta -currentbeta -currentalpha newnode 0 (newnode.AvailableMoves.Force()) (currentdepth-1))
-                             //do undo
-                             do undoUpdate newnode newundo 
-                             //alpha prune
-                             let newalpha = max currentalpha newtest
-                             //beta prune
-                             if newalpha >= currentbeta then
-                             //since we didn't continue this is a lower bound
-                                         do setTranspose currentnode.ZobristHash newalpha Transpose.Lower currentdepth currentnode.Turn
-                                         newalpha
-                             //continue traveling breadthwise
-                             else searcher origalpha newalpha currentbeta currentnode (index+1) movelist currentdepth
-                                
+            | head :: tail->  let score = node.DoUpdate(head)
+                              //travel the depth
+                              let newtest =  -(match currentdepth-1 with 
+                                               | x when x <= 0 || node.IsTerminal() -> node.Score
+                                               | _ ->  match (getTranspose node.ZobristHash (currentdepth-1) node.Turn) with
+                                                       | Some(Transpose.Exact,x) -> x
+                                                       | Some(Transpose.Upper,x) when x <= -currentbeta-> x
+                                                       | Some(Transpose.Lower,x) when x >= -currentalpha -> x
+                                                       | _ ->  searcher -currentbeta -currentbeta -currentalpha (node.AvailableMoves.Force()) (currentdepth-1))
+                              //do undo
+                              do node.UndoUpdate()
+                              //alpha prune
+                              let newalpha = max currentalpha newtest
+                              //beta prune
+                              if newalpha >= currentbeta then
+                              //since we didn't continue this is a lower bound
+                                          do setTranspose node.ZobristHash newalpha Transpose.Lower currentdepth node.Turn
+                                          newalpha
+                              //continue traveling breadthwise
+                              else searcher origalpha newalpha currentbeta tail currentdepth
+                              
             | _  -> if currentalpha > origalpha && currentalpha < currentbeta then 
                                  //in window, perfect hit
-                                 do setTranspose currentnode.ZobristHash currentalpha Transpose.Exact currentdepth currentnode.Turn
+                                 do setTranspose node.ZobristHash currentalpha Transpose.Exact currentdepth node.Turn
                                  //since we don't know if we got this or something less than this, this is
                                  //an upperbound
                     elif currentalpha <= origalpha then
-                                 do setTranspose currentnode.ZobristHash currentalpha Transpose.Upper currentdepth currentnode.Turn
+                                 do setTranspose node.ZobristHash currentalpha Transpose.Upper currentdepth node.Turn
                     else ()
                     currentalpha
                         
@@ -242,16 +244,16 @@ module AlphaBeta2 =
         //iterative deepening
         let rec deepener appdepth currbestmove =
 
-            let newmove = searcher -inf -inf inf node 0 (node.AvailableMoves.Force()) appdepth
+            let newmove = searcher -Inf -Inf Inf (node.AvailableMoves.Force()) appdepth
             if pred() then 
                     do printfn "fake searchdepth %d" (appdepth-2)
-                    (botMove,currbestmove)
+                    (BotMove,currbestmove)
             //if we hit an endgame
             //otherwise keep going by 2
             else deepener (appdepth+2) newmove 
         deepener 1 0
 
 
-    let NewDFSABID time input = AlphaBetaDFSID input time (-inf) inf
-    let NewDFSABIDTT time input = AlphaBetaDFSTT input time (-inf) inf
+    let NewDFSABID time input = AlphaBetaDFSID input time
+    let NewDFSABIDTT time input = AlphaBetaDFSTT input time
     let Ponderer pred input = Ponder pred input

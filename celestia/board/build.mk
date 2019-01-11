@@ -17,10 +17,12 @@ $(libs)/ZobristHash.dll : $(libs)/Primitives.dll \
 
 $(libs)/MoveGeneration.dll : $(libs)/Primitives.dll \
                       $(libs)/ZobristHash.dll \
+                      $(libs)/FoldBreak.dll \
                       board/MoveGeneration.fs
 	$(fsc) $(optimize) -r:Primitives.dll \
                        -r:ZobristHash.dll \
-                        -a \
+                       -r:FoldBreak.dll \
+                       -a \
                        --out:$(libs)/MoveGeneration.dll \
                        board/MoveGeneration.fs
 
@@ -31,6 +33,6 @@ $(libs)/GameState.dll : $(libs)/Primitives.dll \
 	$(fsc) $(optimize) -r:Primitives.dll \
                        -r:ZobristHash.dll \
                        -r:MoveGeneration.dll \
-                        -a \
+                       -a \
                        --out:$(libs)/GameState.dll \
                        board/GameState.fs

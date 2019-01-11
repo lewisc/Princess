@@ -7,18 +7,9 @@ open System
 open Primitives
 open ZobristHash
 
+open CustomLib
+
 module MoveGeneration =
-
-    let rec private foldBreak<'In, 'Acc> (app : 'In -> 'Acc -> Choice<'Acc, 'Acc>)
-                                         (values : 'In list)
-                                         (initialAcc : 'Acc) : 'Acc = 
-                    match values with
-                    | [] -> initialAcc
-                    | head :: tail ->
-                      match (app head initialAcc) with
-                      | Choice2Of2(value) -> value
-                      | Choice1Of2(value) -> foldBreak app tail value
-
 
     ///Types of ways that a square can be captured
     type private PieceCaptures =
@@ -72,8 +63,8 @@ module MoveGeneration =
             | Invalid -> Choice2Of2(acc)
             | Capture -> Choice2Of2(((x, y), (xval, yval)) :: acc)
 
-        foldBreak moveEval [for i in 1 .. endCount
-                                -> (x + dx * i, y + dy * i)] []
+        FoldBreak.foldBreak moveEval [for i in 1 .. endCount
+                                       -> (x + dx * i, y + dy * i)] []
       
     //gets a list of all valid moves from a 
     //piece at a given coordinate(can be a hypothetical piece)
