@@ -138,4 +138,3 @@ module MoveGeneration =
     let movesFrom (input : PieceLoc list) (board : Board) : (Ply list) = 
         //get all of the available moves
         List.collect (fun (piece, pos) -> validMoves piece pos board) input 
-

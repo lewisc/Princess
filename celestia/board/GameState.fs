@@ -191,4 +191,3 @@ module GameState =
                      |> String.concat "\n"
                      |> sprintf "turn:%d\n%s" index
 
-
